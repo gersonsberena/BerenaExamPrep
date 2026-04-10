@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Berena Test Bank — Exam Prep</title>
+<meta name="theme-color" content="#f0c040"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Berena Test Bank"/>
+<link rel="apple-touch-icon" id="pwa-icon-link"/>
+<link rel="manifest" id="pwa-manifest-link"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e2a;
+    --border: #252936;
+    --accent: #f0c040;
+    --accent2: #e07b3a;
+    --accent3: #5b9cf6;
+    --green: #4caf7d;
+    --red: #e05c5c;
+    --text: #eef0f6;
+    --text2: #8890aa;
+    --text3: #555e78;
+    --radius: 12px;
+    --radius-sm: 7px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── BACKGROUND ──────────────────────── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 80% 10%, rgba(240,192,64,.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 10% 90%, rgba(91,156,246,.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  #app { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* ─── HEADER ──────────────────────────── */
+  .header { text-align: center; margin-bottom: 48px; }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 6vw, 3.6rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+  .logo span { color: var(--accent); font-style: italic; }
+  .tagline { color: var(--text2); font-size: .95rem; margin-top: 8px; letter-spacing: .5px; }
+
+  /* ─── CARD ────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .card-title .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); flex-shrink: 0;
+  }
+
+  /* ─── EXAM GRID ───────────────────────── */
+  .exam-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .exam-btn {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 14px;
+    cursor: pointer;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .9rem;
+    font-weight: 500;
+    text-align: left;
+    transition: all .18s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .exam-btn::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: var(--accent);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform .22s ease;
+  }
+  .exam-btn:hover { border-color: var(--accent); background: #1e2130; }
+  .exam-btn:hover::before { transform: scaleX(1); }
+  .exam-btn.selected { border-color: var(--accent); background: rgba(240,192,64,.08); }
+  .exam-btn.selected::before { transform: scaleX(1); }
+  .exam-label { font-size: .7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; font-weight: 600; }
+
+  /* ─── TOPIC CHECKBOXES ────────────────── */
+  .topic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+  }
+  .topic-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .topic-item:hover { border-color: var(--accent3); }
+  .topic-item.checked { border-color: var(--accent3); background: rgba(91,156,246,.08); }
+  .topic-item input[type=checkbox] { display: none; }
+  .check-box {
+    width: 18px; height: 18px; flex-shrink: 0;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+  }
+  .topic-item.checked .check-box {
+    background: var(--accent3); border-color: var(--accent3);
+  }
+  .check-box svg { display: none; }
+  .topic-item.checked .check-box svg { display: block; }
+  .topic-label { font-size: .88rem; color: var(--text); line-height: 1.3; }
+
+  .select-all-btn {
+    background: none; border: none; color: var(--accent3);
+    font-size: .82rem; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    padding: 0; margin-bottom: 14px; text-decoration: underline;
+  }
+
+  /* ─── OPTIONS ROW ─────────────────────── */
+  .options-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .opt-btn {
+    flex: 1; min-width: 120px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    cursor: pointer; color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .88rem; font-weight: 500;
+    transition: all .15s;
+    text-align: center;
+  }
+  .opt-btn:hover { border-color: var(--accent2); }
+  .opt-btn.selected { border-color: var(--accent2); background: rgba(224,123,58,.1); color: var(--accent2); }
+
+  /* ─── NUMBER INPUT ────────────────────── */
+  .num-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .num-presets { display: flex; gap: 8px; flex-wrap: wrap; }
+  .preset-btn {
+    background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); padding: 8px 16px;
+    cursor: pointer; color: var(--text2);
+    font-family: 'DM Mono', monospace; font-size: .85rem;
+    transition: all .15s;
+  }
+  .preset-btn:hover, .preset-btn.selected { border-color: var(--accent); color: var(--accent); background: rgba(240,192,64,.07); }
+  .custom-num {
+    background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); padding: 8px 14px;
+    color: var(--text); font-family: 'DM Mono', monospace; font-size: .85rem;
+    width: 80px; outline: none;
+    transition: border-color .15s;
+  }
+  .custom-num:focus { border-color: var(--accent); }
+
+  /* ─── BUTTON ──────────────────────────── */
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent); color: #0d0f14;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem; font-weight: 700;
+    border: none; border-radius: var(--radius-sm);
+    padding: 14px 28px; cursor: pointer;
+    transition: all .18s; letter-spacing: .2px;
+  }
+  .btn-primary:hover { background: #f7d060; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: transparent; color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .9rem; font-weight: 500;
+    border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    padding: 10px 20px; cursor: pointer;
+    transition: all .15s;
+  }
+  .btn-secondary:hover { border-color: var(--text2); color: var(--text); }
+
+  /* ─── LOADING ─────────────────────────── */
+  #loading-screen {
+    display: none; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 80px 20px; text-align: center;
+  }
+  .loader {
+    width: 52px; height: 52px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 24px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { color: var(--text2); font-size: 1rem; }
+  .loading-sub { color: var(--text3); font-size: .82rem; margin-top: 6px; font-family: 'DM Mono', monospace; }
+
+  /* ─── QUIZ SCREEN ─────────────────────── */
+  /* quiz-screen visibility controlled by JS */
+
+  .quiz-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
+  }
+  .quiz-meta { font-size: .82rem; color: var(--text2); }
+  .quiz-meta strong { color: var(--accent); }
+  .progress-bar-wrap {
+    background: var(--surface2); border-radius: 99px; height: 5px;
+    margin-bottom: 28px; overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px; transition: width .4s ease;
+  }
+
+  .question-num {
+    font-size: .78rem; color: var(--text3); font-family: 'DM Mono', monospace;
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
+  }
+  .question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.05rem, 2.5vw, 1.22rem);
+    line-height: 1.6; color: var(--text);
+    margin-bottom: 28px;
+  }
+
+  /* MCQ choices */
+  .choices { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .choice-btn {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px; cursor: pointer;
+    text-align: left; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: .9rem; line-height: 1.5;
+    transition: all .15s;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: var(--accent3); background: rgba(91,156,246,.06); }
+  .choice-btn:disabled { cursor: default; }
+  .choice-letter {
+    font-family: 'DM Mono', monospace; font-size: .8rem; font-weight: 500;
+    color: var(--text3); background: var(--surface);
+    border-radius: 4px; padding: 2px 7px; flex-shrink: 0; margin-top: 1px;
+  }
+  .choice-btn.correct { border-color: var(--green); background: rgba(76,175,125,.1); }
+  .choice-btn.correct .choice-letter { background: var(--green); color: #fff; }
+  .choice-btn.wrong { border-color: var(--red); background: rgba(224,92,92,.1); }
+  .choice-btn.wrong .choice-letter { background: var(--red); color: #fff; }
+
+  /* FRQ answer */
+  .frq-area {
+    width: 100%;
+    background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px;
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .9rem;
+    line-height: 1.6; resize: vertical; min-height: 120px; outline: none;
+    transition: border-color .15s;
+  }
+  .frq-area:focus { border-color: var(--accent3); }
+
+  /* Feedback */
+  .feedback-box {
+    border-radius: var(--radius-sm);
+    padding: 16px 18px; margin-top: 16px;
+    border: 1.5px solid;
+    animation: fadeSlide .25s ease;
+  }
+  @keyframes fadeSlide { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform:none; } }
+  .feedback-box.correct { border-color: var(--green); background: rgba(76,175,125,.08); }
+  .feedback-box.wrong { border-color: var(--red); background: rgba(224,92,92,.08); }
+  .feedback-box.frq { border-color: var(--accent3); background: rgba(91,156,246,.08); }
+  .feedback-title {
+    font-weight: 700; font-size: .88rem; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .feedback-box.correct .feedback-title { color: var(--green); }
+  .feedback-box.wrong .feedback-title { color: var(--red); }
+  .feedback-box.frq .feedback-title { color: var(--accent3); }
+  .feedback-model-answer {
+    font-size: .82rem; color: var(--text2); margin-bottom: 6px;
+    font-family: 'DM Mono', monospace;
+  }
+  .feedback-explanation { font-size: .88rem; color: var(--text); line-height: 1.6; }
+
+  .quiz-actions { display: flex; gap: 12px; margin-top: 20px; align-items: center; }
+
+  /* ─── RESULTS SCREEN ──────────────────── */
+  /* results-screen visibility controlled by JS */
+
+  .results-hero {
+    text-align: center; padding: 40px 20px 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+  }
+  .score-ring {
+    width: 110px; height: 110px;
+    border-radius: 50%; margin: 0 auto 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; font-weight: 900;
+    border: 4px solid;
+    position: relative;
+  }
+  .score-ring.great { border-color: var(--green); color: var(--green); }
+  .score-ring.ok { border-color: var(--accent); color: var(--accent); }
+  .score-ring.poor { border-color: var(--red); color: var(--red); }
+  .results-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 6px; }
+  .results-sub { color: var(--text2); font-size: .9rem; }
+
+  .review-section { margin-top: 8px; }
+  .review-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 22px; margin-bottom: 14px;
+    border-left: 4px solid;
+  }
+  .review-item.correct { border-left-color: var(--green); }
+  .review-item.wrong { border-left-color: var(--red); }
+  .review-item.frq-review { border-left-color: var(--accent3); }
+  .review-q-num { font-size: .75rem; font-family: 'DM Mono', monospace; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .review-q-text { font-family: 'Playfair Display', serif; font-size: 1rem; line-height: 1.5; margin-bottom: 12px; }
+  .review-answer-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+  .review-answer-pill {
+    font-size: .78rem; font-family: 'DM Mono', monospace;
+    padding: 4px 10px; border-radius: 99px;
+  }
+  .review-answer-pill.correct { background: rgba(76,175,125,.15); color: var(--green); }
+  .review-answer-pill.wrong { background: rgba(224,92,92,.15); color: var(--red); }
+  .review-explanation { font-size: .87rem; color: var(--text2); line-height: 1.6; border-top: 1px solid var(--border); padding-top: 10px; margin-top: 4px; }
+
+  .results-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+
+  /* ─── ERROR ───────────────────────────── */
+  .error-box {
+    background: rgba(224,92,92,.1); border: 1.5px solid var(--red);
+    border-radius: var(--radius-sm); padding: 14px 18px;
+    font-size: .88rem; color: #f8a0a0; display: none; margin-bottom: 16px;
+  }
+
+  /* ─── QUIT BUTTON ────────────────────────── */
+  .quit-btn {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text3);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .8rem;
+    font-weight: 500;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .quit-btn:hover {
+    border-color: var(--red);
+    color: var(--red);
+    background: rgba(224,92,92,.07);
+  }
+
+  /* ─── API KEY SETUP ───────────────────── */
+  .api-setup {
+    background: var(--surface2); border: 1.5px solid var(--accent);
+    border-radius: var(--radius); padding: 24px;
+    margin-bottom: 24px;
+  }
+  .api-setup label { font-size: .85rem; color: var(--text2); display: block; margin-bottom: 8px; }
+  .api-setup input {
+    width: 100%; background: var(--surface);
+    border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    padding: 11px 14px; color: var(--text);
+    font-family: 'DM Mono', monospace; font-size: .85rem; outline: none;
+    transition: border-color .15s;
+  }
+  .api-setup input:focus { border-color: var(--accent); }
+  .api-note { font-size: .78rem; color: var(--text3); margin-top: 8px; line-height: 1.5; }
+
+  /* ─── FRQ SELF-GRADE ─────────────────────── */
+  .frq-grade-row { margin-top: 14px; }
+  .frq-grade-label { font-size: .82rem; color: var(--text2); margin-bottom: 8px; }
+  .frq-grade-btns { display: flex; gap: 10px; }
+  .grade-btn {
+    flex: 1; padding: 10px 16px;
+    border-radius: var(--radius-sm); border: 1.5px solid;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    font-size: .88rem; font-weight: 600; transition: all .15s;
+    background: transparent;
+  }
+  .grade-btn.yes { border-color: var(--green); color: var(--green); }
+  .grade-btn.yes:hover:not(:disabled) { background: rgba(76,175,125,.15); }
+  .grade-btn.no  { border-color: var(--red);   color: var(--red);   }
+  .grade-btn.no:hover:not(:disabled)  { background: rgba(224,92,92,.15);  }
+  .grade-btn:disabled { opacity: .35; cursor: default; }
+
+  /* ─── STREAK BADGE ──────────────────────── */
+  .streak-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(240,192,64,.1); border: 1px solid rgba(240,192,64,.3);
+    border-radius: 99px; padding: 4px 14px;
+    font-size: .82rem; font-weight: 600; color: var(--accent);
+    margin-top: 10px;
+  }
+
+  /* ─── TIMER ──────────────────────────────── */
+  .timer-display {
+    font-family: 'DM Mono', monospace; font-size: .78rem;
+    color: var(--text3); text-align: right; margin-bottom: 4px;
+    transition: color .3s;
+  }
+  .timer-display.warning { color: var(--accent); }
+  .timer-display.danger  { color: var(--red); }
+  .timer-bar-wrap {
+    background: var(--surface2); border-radius: 99px; height: 4px;
+    margin-bottom: 20px; overflow: hidden;
+  }
+  .timer-bar {
+    height: 100%; border-radius: 99px; background: var(--green);
+    transition: width 1s linear, background .3s;
+  }
+  .timer-bar.warning { background: var(--accent); }
+  .timer-bar.danger  { background: var(--red); }
+
+  /* ─── HISTORY ────────────────────────────── */
+  .history-item {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px 16px;
+    margin-bottom: 8px; gap: 12px; flex-wrap: wrap;
+  }
+  .history-exam { font-size: .88rem; font-weight: 600; color: var(--text); }
+  .history-meta { font-size: .75rem; color: var(--text3); font-family: 'DM Mono', monospace; margin-top: 2px; }
+  .history-score {
+    font-family: 'Playfair Display', serif; font-size: 1.15rem;
+    font-weight: 900; flex-shrink: 0;
+  }
+  .history-score.great { color: var(--green); }
+  .history-score.ok    { color: var(--accent); }
+  .history-score.poor  { color: var(--red); }
+  .history-empty { font-size: .85rem; color: var(--text3); text-align: center; padding: 20px 0; }
+
+  /* ─── TOPIC BREAKDOWN ───────────────────── */
+  .topic-stats { display: flex; flex-direction: column; gap: 8px; }
+  .topic-stat-row { display: flex; align-items: center; gap: 10px; }
+  .topic-stat-name {
+    font-size: .8rem; color: var(--text2); flex: 1; min-width: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .topic-stat-bar-wrap { width: 100px; height: 5px; background: var(--surface2); border-radius: 99px; flex-shrink: 0; }
+  .topic-stat-bar { height: 100%; border-radius: 99px; transition: width .5s ease .1s; }
+  .topic-stat-num { font-family: 'DM Mono', monospace; font-size: .72rem; color: var(--text3); flex-shrink: 0; width: 36px; text-align: right; }
+
+  /* ─── SECTION DIVIDER ─────────────────── */
+  .section-sep { height: 1px; background: var(--border); margin: 28px 0; }
+
+  /* ─── UTIL ────────────────────────────── */
+  .hidden { display: none !important; }
+  .mt-20 { margin-top: 20px; }
+  .flex-end { display: flex; justify-content: flex-end; }
+
+  @media (max-width: 520px) {
+    .card { padding: 20px 16px; }
+    .exam-grid { grid-template-columns: 1fr 1fr; }
+    .options-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">Berena <span>Test Bank.</span></div>
+    <div class="tagline">Prep on Exam with the help of AI</div>
+    <div id="streak-badge" class="streak-badge" style="display:none;">🔥 <span id="streak-count">0</span>-day streak</div>
+  </div>
+
+  <!-- ── SETUP SCREEN ─────────────────────────── -->
+  <div id="setup-screen">
+
+    <!-- API Key -->
+    <div class="api-setup">
+      <div class="card-title"><span class="dot"></span> Anthropic API Key</div>
+      <label>Paste your API key below — it stays in your browser and is never sent anywhere except Anthropic.</label>
+      <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." autocomplete="off"/>
+      <div class="api-note">Get a key at console.anthropic.com → API Keys. Each full quiz session = 1 API call.</div>
+    </div>
+
+    <div class="error-box" id="error-box"></div>
+
+    <!-- Step 1 — Exam -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span> Step 1 — Choose Your Exam</div>
+      <div class="exam-grid" id="exam-grid"></div>
+    </div>
+
+    <!-- Step 2 — Topics -->
+    <div class="card hidden" id="topics-card">
+      <div class="card-title"><span class="dot"></span> Step 2 — Select Topics</div>
+      <button class="select-all-btn" id="select-all-btn">Select All</button>
+      <div class="topic-grid" id="topic-grid"></div>
+    </div>
+
+    <!-- Step 3 — Type & Difficulty -->
+    <div class="card hidden" id="options-card">
+      <div class="card-title"><span class="dot"></span> Step 3 — Question Type &amp; Difficulty</div>
+
+      <div style="margin-bottom:18px">
+        <div style="font-size:.82rem;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;">Question Type</div>
+        <div class="options-row" id="type-row">
+          <button class="opt-btn" data-val="MCQ">📋 Multiple Choice (MCQ)</button>
+          <button class="opt-btn" data-val="FRQ">✍️ Free Response (FRQ)</button>
+          <button class="opt-btn" data-val="Mixed">🔀 Mixed (MCQ + FRQ)</button>
+        </div>
+      </div>
+
+      <div class="section-sep"></div>
+
+      <div>
+        <div style="font-size:.82rem;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;">Difficulty</div>
+        <div class="options-row" id="diff-row">
+          <button class="opt-btn" data-val="Easy">🟢 Easy</button>
+          <button class="opt-btn" data-val="Medium">🟡 Medium</button>
+          <button class="opt-btn" data-val="Hard">🔴 Hard</button>
+          <button class="opt-btn" data-val="Mixed">🎲 Mixed</button>
+        </div>
+      </div>
+
+      <div class="section-sep"></div>
+
+      <div>
+        <div style="font-size:.82rem;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;">Timer per Question</div>
+        <div class="options-row" id="timer-row">
+          <button class="opt-btn selected" data-secs="0">⏱ No Timer</button>
+          <button class="opt-btn" data-secs="30">30 s</button>
+          <button class="opt-btn" data-secs="60">1 min</button>
+          <button class="opt-btn" data-secs="120">2 min</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 — Number of Questions -->
+    <div class="card hidden" id="num-card">
+      <div class="card-title"><span class="dot"></span> Step 4 — How Many Questions?</div>
+      <div class="num-row">
+        <div class="num-presets" id="num-presets">
+          <button class="preset-btn" data-n="1">1</button>
+          <button class="preset-btn" data-n="2">2</button>
+          <button class="preset-btn" data-n="3">3</button>
+          <button class="preset-btn" data-n="5">5</button>
+          <button class="preset-btn" data-n="10">10</button>
+          <button class="preset-btn" data-n="15">15</button>
+          <button class="preset-btn" data-n="20">20</button>
+          <button class="preset-btn" data-n="30">30</button>
+        </div>
+        <input type="number" class="custom-num" id="custom-num" min="1" max="50" placeholder="Other"/>
+      </div>
+    </div>
+
+    <!-- Generate -->
+    <div class="card hidden" id="generate-card">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <button class="btn-primary" id="generate-btn" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Generate Quiz
+        </button>
+        <span id="summary-text" style="font-size:.85rem;color:var(--text2);"></span>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="card" id="history-card">
+      <div class="card-title"><span class="dot" style="background:var(--accent3)"></span> Session History</div>
+      <div id="history-list"></div>
+      <button class="btn-secondary" id="clear-history-btn" style="margin-top:14px;font-size:.8rem;padding:8px 14px;">Clear History</button>
+    </div>
+
+  </div><!-- end setup-screen -->
+
+  <!-- ── LOADING SCREEN ───────────────────────── -->
+  <div id="loading-screen">
+    <div class="loader"></div>
+    <div class="loading-text">Generating your questions…</div>
+    <div class="loading-sub" id="loading-sub">Making one API call for all questions</div>
+  </div>
+
+  <!-- ── QUIZ SCREEN ───────────────────────────── -->
+  <div id="quiz-screen" style="display:none;">
+    <div class="quiz-header">
+      <div class="quiz-meta">
+        <strong id="qz-exam"></strong> &nbsp;·&nbsp; <span id="qz-type"></span> &nbsp;·&nbsp; <span id="qz-diff"></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div class="quiz-meta">Question <strong id="qz-current">1</strong> of <strong id="qz-total">?</strong></div>
+        <button class="quit-btn" id="quit-btn" title="Back to main menu">&#8962; Menu</button>
+      </div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+    </div>
+    <div id="timer-display" class="timer-display hidden"></div>
+    <div class="timer-bar-wrap hidden" id="timer-bar-wrap">
+      <div class="timer-bar" id="timer-bar" style="width:100%"></div>
+    </div>
+
+    <div class="card" id="question-card">
+      <div class="question-num" id="question-num"></div>
+      <div class="question-text" id="question-text"></div>
+
+      <!-- MCQ choices -->
+      <div class="choices" id="choices-container"></div>
+
+      <!-- FRQ textarea -->
+      <textarea class="frq-area hidden" id="frq-textarea" placeholder="Write your answer here…"></textarea>
+      <div class="mt-20 hidden" id="frq-submit-row">
+        <button class="btn-primary" id="frq-submit-btn">Check My Answer</button>
+      </div>
+
+      <!-- Feedback -->
+      <div class="feedback-box hidden" id="feedback-box">
+        <div class="feedback-title" id="feedback-title"></div>
+        <div class="feedback-model-answer hidden" id="feedback-model-answer"></div>
+        <div class="feedback-explanation" id="feedback-explanation"></div>
+        <div class="frq-grade-row hidden" id="frq-grade-row">
+          <div class="frq-grade-label">Did you get it right?</div>
+          <div class="frq-grade-btns">
+            <button class="grade-btn yes" id="frq-grade-yes">✓ Got it right</button>
+            <button class="grade-btn no"  id="frq-grade-no">✗ Got it wrong</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-actions">
+        <button class="btn-primary hidden" id="next-btn">
+          Next Question →
+        </button>
+        <button class="btn-secondary hidden" id="finish-btn">
+          See Results
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RESULTS SCREEN ────────────────────────── -->
+  <div id="results-screen" style="display:none;">
+    <div class="results-hero">
+      <div class="score-ring" id="score-ring">—</div>
+      <div class="results-title" id="results-title">Session Complete</div>
+      <div class="results-sub" id="results-sub"></div>
+      <div id="topic-breakdown" class="hidden" style="margin-top:20px;text-align:left;border-top:1px solid var(--border);padding-top:16px;"></div>
+    </div>
+
+    <div class="review-section" id="review-section"></div>
+
+    <div class="results-actions">
+      <button class="btn-primary" id="restart-btn">↩ Study Again</button>
+      <button class="btn-secondary" id="new-quiz-btn">New Quiz (same exam)</button>
+      <button class="btn-secondary" id="export-btn">📋 Copy Summary</button>
+    </div>
+  </div>
+
+</div><!-- end #app -->
+
+<script>
+/* ══════════════════════════════════════════════════
+   DATA: Topics per exam
+══════════════════════════════════════════════════ */
+// ── ADD NEW SUBJECTS HERE ────────────────────────────────────────────────────
+// Each key is the exam name shown on the button.
+// "label" is the badge text (AP, AICE, SAT, GRADE, etc.).
+// "display" is the button text (defaults to the key if omitted).
+// "topics" is the list of topics shown in Step 2.
+// ─────────────────────────────────────────────────────────────────────────────
+const EXAM_TOPICS = {
+  "AP Precalculus": {
+    label: "AP",
+    topics: [
+      "Polynomial and Rational Functions",
+      "Trigonometric Functions",
+      "Exponential and Logarithmic Functions",
+      "Functions: Domain, Range & Transformations",
+      "Rates of Change and Modeling",
+      "Sinusoidal Functions & Modeling",
+      "Inverse Functions",
+      "Polar Coordinates & Complex Numbers",
+      "Matrices and Systems",
+      "Sequences and Series"
+    ]
+  },
+  "AP Biology": {
+    label: "AP",
+    topics: [
+      "Cell Structure and Function",
+      "Cell Division: Mitosis & Meiosis",
+      "Energy & Metabolism (Photosynthesis)",
+      "Cellular Respiration & Fermentation",
+      "Genetics & Heredity (Mendelian)",
+      "DNA Structure, Replication & Expression",
+      "Gene Regulation & Biotechnology",
+      "Evolution & Natural Selection",
+      "Ecology: Populations & Communities",
+      "Plant Structure & Function",
+      "Animal Physiology & Homeostasis",
+      "Free Energy & Thermodynamics"
+    ]
+  },
+  "AICE International History": {
+    label: "AICE",
+    display: "International History",
+    topics: [
+      "Causes of World War I",
+      "The Paris Peace Conference & Treaty of Versailles",
+      "The Rise of Totalitarianism (Stalin, Hitler, Mussolini)",
+      "Causes of World War II",
+      "The Cold War: Origins & Key Events",
+      "Decolonization & Independence Movements",
+      "The United Nations & International Organizations",
+      "The Korean War",
+      "The Cuban Missile Crisis",
+      "Vietnam War & Proxy Conflicts",
+      "Détente and End of the Cold War"
+    ]
+  },
+  "AICE Psychology": {
+    label: "AICE",
+    topics: [
+      "Research Methods & Ethics",
+      "Biological Approach to Behavior",
+      "Cognitive Approach: Memory & Thinking",
+      "Behavioral Approach & Learning Theory",
+      "Social Influence & Conformity",
+      "Developmental Psychology",
+      "Abnormal Psychology & Diagnosis",
+      "Treatments & Therapies",
+      "Stress, Health & Coping",
+      "Criminological Psychology",
+      "Relationships & Social Psychology"
+    ]
+  },
+  "SAT": {
+    label: "SAT",
+    display: "SAT (Math + Reading)",
+    topics: [
+      "Reading: Informational & Literary Texts",
+      "Reading: Evidence-Based Questions",
+      "Reading: Vocabulary in Context",
+      "Writing: Grammar & Usage",
+      "Writing: Sentence Structure & Punctuation",
+      "Writing: Rhetoric & Purpose",
+      "Math: Algebra & Linear Equations",
+      "Math: Advanced Algebra & Functions",
+      "Math: Problem Solving & Data Analysis",
+      "Math: Geometry & Trigonometry",
+      "Math: Calculator vs No-Calculator Strategies"
+    ]
+  },
+  "3rd Grade Math": {
+    label: "GRADE 3",
+    topics: [
+      "Addition & Subtraction (up to 1000)",
+      "Multiplication Concepts & Facts (0–10)",
+      "Division Concepts & Fact Families",
+      "Fractions: Halves, Thirds & Fourths",
+      "Place Value & Rounding",
+      "Telling Time & Elapsed Time",
+      "Money: Counting & Making Change",
+      "Measurement: Length, Weight & Volume",
+      "Perimeter & Area of Shapes",
+      "Graphs: Bar Graphs & Pictographs",
+      "Patterns & Number Sequences",
+      "Word Problems & Problem Solving"
+    ]
+  },
+  "AMC8 (American Math Competition 8)": {
+    label: "AMC8",
+    topics: [
+      "AMC8"
+    ]
+  }
+};
+
+/* ══════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════ */
+let state = {
+  exam: null,
+  topics: [],
+  qType: null,
+  difficulty: null,
+  numQ: null,
+  timerSecs: 0,
+  questions: [],
+  currentIdx: 0,
+  results: [],
+  apiKey: ''
+};
+
+/* ══════════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════════ */
+const $ = id => document.getElementById(id);
+const show = id => $(id).style.display = '';
+const hide = id => $(id).style.display = 'none';
+
+function escapeHTML(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/* ══════════════════════════════════════════════════
+   PWA — inline manifest + iOS home screen icon
+══════════════════════════════════════════════════ */
+(function () {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512; canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  // Rounded background
+  ctx.fillStyle = '#0d0f14';
+  ctx.beginPath();
+  ctx.roundRect(0, 0, 512, 512, 90);
+  ctx.fill();
+  // Gold border
+  ctx.strokeStyle = '#f0c040';
+  ctx.lineWidth = 18;
+  ctx.beginPath();
+  ctx.roundRect(9, 9, 494, 494, 84);
+  ctx.stroke();
+  // Italic "A"
+  ctx.fillStyle = '#f0c040';
+  ctx.font = 'italic 900 340px Georgia, serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText('A', 256, 400);
+  const iconDataURL = canvas.toDataURL('image/png');
+
+  document.getElementById('pwa-icon-link').href = iconDataURL;
+
+  const manifest = {
+    name: 'Berena Test Bank — Exam Prep',
+    short_name: 'Berena Test Bank',
+    description: 'AI-powered exam prep quiz generator',
+    start_url: './',
+    display: 'standalone',
+    background_color: '#0d0f14',
+    theme_color: '#f0c040',
+    icons: [{ src: iconDataURL, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+  document.getElementById('pwa-manifest-link').href = URL.createObjectURL(blob);
+})();
+
+// Pre-fill saved API key
+const _savedKey = localStorage.getItem('anthropic_key');
+if (_savedKey) $('api-key-input').value = _savedKey;
+
+/* ══════════════════════════════════════════════════
+   STREAK
+══════════════════════════════════════════════════ */
+function getTodayStr() { return new Date().toISOString().split('T')[0]; }
+function getYesterdayStr() { return new Date(Date.now() - 86400000).toISOString().split('T')[0]; }
+
+function renderStreak() {
+  const raw = localStorage.getItem('streak_data');
+  if (!raw) { $('streak-badge').style.display = 'none'; return; }
+  const data = JSON.parse(raw);
+  const today = getTodayStr(), yesterday = getYesterdayStr();
+  if ((data.lastDate === today || data.lastDate === yesterday) && data.count >= 1) {
+    $('streak-count').textContent = data.count;
+    $('streak-badge').style.display = 'inline-flex';
+  } else {
+    $('streak-badge').style.display = 'none';
+  }
+}
+
+function saveStreak() {
+  const today = getTodayStr(), yesterday = getYesterdayStr();
+  const data = JSON.parse(localStorage.getItem('streak_data') || '{"lastDate":"","count":0}');
+  let count;
+  if (data.lastDate === today)     count = data.count;           // already played today
+  else if (data.lastDate === yesterday) count = data.count + 1;  // consecutive day
+  else                             count = 1;                     // streak broken
+  localStorage.setItem('streak_data', JSON.stringify({ lastDate: today, count }));
+  return count;
+}
+
+/* ══════════════════════════════════════════════════
+   SESSION HISTORY
+══════════════════════════════════════════════════ */
+function saveHistory(entry) {
+  const history = JSON.parse(localStorage.getItem('quiz_history') || '[]');
+  history.unshift(entry);
+  if (history.length > 20) history.length = 20;
+  localStorage.setItem('quiz_history', JSON.stringify(history));
+}
+
+function renderHistory() {
+  const history = JSON.parse(localStorage.getItem('quiz_history') || '[]');
+  const list = $('history-list');
+  list.innerHTML = '';
+  if (history.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'history-empty';
+    empty.textContent = 'No sessions yet. Complete a quiz to see your history here.';
+    list.appendChild(empty);
+    return;
+  }
+  history.forEach(h => {
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    const left = document.createElement('div');
+    const examEl = document.createElement('div');
+    examEl.className = 'history-exam';
+    examEl.textContent = h.exam;
+    const metaEl = document.createElement('div');
+    metaEl.className = 'history-meta';
+    metaEl.textContent = `${h.date} · ${h.type} · ${h.difficulty} · ${h.numQ}Q`;
+    left.appendChild(examEl);
+    left.appendChild(metaEl);
+    const scoreEl = document.createElement('div');
+    scoreEl.className = 'history-score ' + (h.pct >= 75 ? 'great' : h.pct >= 50 ? 'ok' : 'poor');
+    scoreEl.textContent = h.pct + '%';
+    item.appendChild(left);
+    item.appendChild(scoreEl);
+    list.appendChild(item);
+  });
+}
+
+renderStreak();
+renderHistory();
+
+/* ══════════════════════════════════════════════════
+   TIMER
+══════════════════════════════════════════════════ */
+let _timerInterval = null;
+
+function startTimer(seconds) {
+  clearTimer();
+  if (!seconds) return;
+  let remaining = seconds;
+  const wrap = $('timer-bar-wrap');
+  const bar  = $('timer-bar');
+  const disp = $('timer-display');
+  wrap.classList.remove('hidden');
+  disp.classList.remove('hidden');
+  bar.style.transition = 'none';
+  bar.style.width = '100%';
+  bar.className = 'timer-bar';
+  disp.className = 'timer-display';
+
+  function updateDisplay() {
+    const pct = (remaining / seconds) * 100;
+    bar.style.transition = 'width 1s linear';
+    bar.style.width = pct + '%';
+    const m = Math.floor(remaining / 60), s = remaining % 60;
+    disp.textContent = m > 0 ? `${m}:${s.toString().padStart(2,'0')}` : `${s}s`;
+    if (pct <= 25) {
+      bar.className = 'timer-bar danger';
+      disp.className = 'timer-display danger';
+    } else if (pct <= 50) {
+      bar.className = 'timer-bar warning';
+      disp.className = 'timer-display warning';
+    }
+  }
+
+  updateDisplay();
+  _timerInterval = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) { clearTimer(); handleTimerExpired(); return; }
+    updateDisplay();
+  }, 1000);
+}
+
+function clearTimer() {
+  if (_timerInterval) { clearInterval(_timerInterval); _timerInterval = null; }
+  $('timer-bar-wrap').classList.add('hidden');
+  $('timer-display').classList.add('hidden');
+}
+
+function handleTimerExpired() {
+  const q = state.questions[state.currentIdx];
+  const isMCQ = q.type === 'MCQ';
+  if (isMCQ) {
+    $('choices-container').querySelectorAll('.choice-btn').forEach((btn, i) => {
+      btn.disabled = true;
+      if (q.choices[i].trim() === q.correct_answer.trim()) btn.classList.add('correct');
+    });
+    showFeedback('wrong', q.explanation, null);
+    state.results.push({ question: q.question, userAnswer: '(time expired)',
+      correctAnswer: q.correct_answer, isCorrect: false,
+      explanation: q.explanation, choices: q.choices, type: 'MCQ', topic: q.topic || '' });
+    showNextOrFinish();
+  } else {
+    const userAns = $('frq-textarea').value.trim() || '(time expired)';
+    $('frq-textarea').disabled = true;
+    $('frq-submit-btn').disabled = true;
+    showFeedback('frq', q.explanation, q.answer);
+    state.results.push({ question: q.question, userAnswer: userAns,
+      correctAnswer: q.answer, isCorrect: null,
+      explanation: q.explanation, type: 'FRQ', topic: q.topic || '' });
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   EXPORT
+══════════════════════════════════════════════════ */
+function buildExportText() {
+  const results = state.results;
+  const correct = results.filter(r => r.isCorrect === true).length;
+  const pct = results.length ? Math.round((correct / results.length) * 100) : 0;
+  let t = `EXAM PREP RESULTS — ${state.exam}\n`;
+  t += `Date: ${new Date().toLocaleDateString()}\n`;
+  t += `Type: ${state.qType}  ·  Difficulty: ${state.difficulty}  ·  ${results.length} questions\n`;
+  t += `Score: ${correct}/${results.length} (${pct}%)\n`;
+  t += `Topics: ${state.topics.join(', ')}\n`;
+  t += '─'.repeat(50) + '\n\n';
+  results.forEach((r, i) => {
+    const status = r.isCorrect === true ? '✅' : r.isCorrect === false ? '❌' : '📝';
+    t += `Q${i+1} [${r.type}] ${status}  ${r.topic ? '(' + r.topic + ')' : ''}\n`;
+    t += r.question + '\n';
+    if (r.type === 'MCQ') {
+      t += `Your answer: ${r.userAnswer}\n`;
+      if (!r.isCorrect) t += `Correct:     ${r.correctAnswer}\n`;
+    } else {
+      t += `Your answer: ${r.userAnswer}\n`;
+      t += `Model answer: ${r.correctAnswer}\n`;
+    }
+    t += `Explanation: ${r.explanation}\n\n`;
+  });
+  return t;
+}
+
+function showError(msg) {
+  const el = $('error-box');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideError() {
+  $('error-box').style.display = 'none';
+}
+
+function revealCard(id) {
+  const el = $(id);
+  if (!el.classList.contains('hidden') && el.style.display !== 'none') return; // already visible
+  el.classList.remove('hidden');
+  el.style.display = '';   // clear any inline display:none
+  el.style.opacity = 0;
+  el.style.transform = 'translateY(10px)';
+  el.style.transition = 'opacity .3s ease, transform .3s ease';
+  requestAnimationFrame(() => {
+    el.style.opacity = 1;
+    el.style.transform = 'translateY(0)';
+  });
+}
+
+function updateSummary() {
+  const missing = [];
+  if (!state.exam) missing.push('exam');
+  if (!state.topics.length) missing.push('at least one topic');
+  if (!state.qType) missing.push('question type');
+  if (!state.difficulty) missing.push('difficulty');
+  if (!state.numQ) missing.push('number of questions');
+
+  if (missing.length > 0) {
+    $('generate-btn').disabled = true;
+    $('summary-text').textContent = 'Still needed: ' + missing.join(', ');
+  } else {
+    $('generate-btn').disabled = false;
+    $('summary-text').textContent =
+      state.numQ + ' ' + state.difficulty + ' ' + state.qType + ' questions on ' + state.topics.length + ' topic(s)';
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   EXAM SELECTION — auto-built from EXAM_TOPICS
+══════════════════════════════════════════════════ */
+function buildExamButtons() {
+  const grid = $('exam-grid');
+  grid.innerHTML = '';
+  Object.entries(EXAM_TOPICS).forEach(([key, def]) => {
+    const btn = document.createElement('button');
+    btn.className = 'exam-btn';
+    btn.dataset.exam = key;
+    btn.innerHTML = `<div class="exam-label">${def.label}</div>${def.display || key}`;
+    btn.addEventListener('click', () => {
+      grid.querySelectorAll('.exam-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.exam = key;
+      state.topics = [];
+      renderTopics();
+      revealCard('topics-card');
+      $('options-card').classList.add('hidden');
+      $('num-card').classList.add('hidden');
+      $('generate-card').classList.add('hidden');
+      state.qType = null; state.difficulty = null; state.numQ = null;
+      document.querySelectorAll('#type-row .opt-btn, #diff-row .opt-btn').forEach(b => b.classList.remove('selected'));
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('selected'));
+      $('custom-num').value = '';
+      updateSummary();
+    });
+    grid.appendChild(btn);
+  });
+}
+buildExamButtons();
+
+/* ══════════════════════════════════════════════════
+   TOPICS
+══════════════════════════════════════════════════ */
+function renderTopics() {
+  const grid = $('topic-grid');
+  grid.innerHTML = '';
+  const topics = (EXAM_TOPICS[state.exam] && EXAM_TOPICS[state.exam].topics) || [];
+  topics.forEach(t => {
+    const item = document.createElement('label');
+    item.className = 'topic-item';
+    item.innerHTML = `
+      <input type="checkbox" value="${t}"/>
+      <span class="check-box">
+        <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="1.5,6 4.5,9 10.5,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="topic-label">${t}</span>
+    `;
+    const cb = item.querySelector('input');
+    cb.addEventListener('change', () => {
+      if (cb.checked) {
+        item.classList.add('checked');
+        if (!state.topics.includes(t)) state.topics.push(t);
+      } else {
+        item.classList.remove('checked');
+        state.topics = state.topics.filter(x => x !== t);
+      }
+      updateSummary();
+      if (state.topics.length > 0 && $('options-card').classList.contains('hidden')) {
+        revealCard('options-card');
+      }
+    });
+    grid.appendChild(item);
+  });
+}
+
+$('select-all-btn').addEventListener('click', () => {
+  const all = $('topic-grid').querySelectorAll('.topic-item');
+  const anyUnchecked = [...all].some(i => !i.classList.contains('checked'));
+  all.forEach(item => {
+    const cb = item.querySelector('input');
+    const t = cb.value;
+    if (anyUnchecked) {
+      item.classList.add('checked');
+      cb.checked = true;
+      if (!state.topics.includes(t)) state.topics.push(t);
+    } else {
+      item.classList.remove('checked');
+      cb.checked = false;
+      state.topics = state.topics.filter(x => x !== t);
+    }
+  });
+  $('select-all-btn').textContent = anyUnchecked ? 'Deselect All' : 'Select All';
+  updateSummary();
+  if (state.topics.length > 0 && $('options-card').classList.contains('hidden')) {
+    revealCard('options-card');
+  }
+});
+
+/* ══════════════════════════════════════════════════
+   QUESTION TYPE & DIFFICULTY
+══════════════════════════════════════════════════ */
+$('type-row').querySelectorAll('.opt-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $('type-row').querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    state.qType = btn.dataset.val;
+    revealCard('num-card');
+    revealCard('generate-card');
+    updateSummary();
+  });
+});
+
+$('diff-row').querySelectorAll('.opt-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $('diff-row').querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    state.difficulty = btn.dataset.val;
+    revealCard('generate-card');
+    updateSummary();
+  });
+});
+
+$('timer-row').querySelectorAll('.opt-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $('timer-row').querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    state.timerSecs = parseInt(btn.dataset.secs);
+  });
+});
+
+/* ══════════════════════════════════════════════════
+   NUMBER SELECTION
+══════════════════════════════════════════════════ */
+$('num-presets').querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $('num-presets').querySelectorAll('.preset-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    $('custom-num').value = '';
+    state.numQ = parseInt(btn.dataset.n);
+    revealCard('generate-card');
+    updateSummary();
+  });
+});
+
+$('custom-num').addEventListener('input', () => {
+  $('num-presets').querySelectorAll('.preset-btn').forEach(b => b.classList.remove('selected'));
+  const v = parseInt($('custom-num').value);
+  state.numQ = (v > 0 && v <= 50) ? v : null;
+  updateSummary();
+});
+
+/* ══════════════════════════════════════════════════
+   GENERATE QUIZ (single API call)
+══════════════════════════════════════════════════ */
+$('generate-btn').addEventListener('click', async () => {
+  hideError();
+
+  // Collect API key
+  const apiKey = $('api-key-input').value.trim();
+  if (!apiKey) { showError('Please enter your Anthropic API key above.'); return; }
+  state.apiKey = apiKey;
+  localStorage.setItem('anthropic_key', apiKey);
+
+  // Validate all fields with a clear message
+  const missing = [];
+  if (!state.exam) missing.push('exam');
+  if (!state.topics.length) missing.push('at least one topic');
+  if (!state.qType) missing.push('question type (MCQ or FRQ)');
+  if (!state.difficulty) missing.push('difficulty level');
+  if (!state.numQ) missing.push('number of questions');
+  if (missing.length > 0) {
+    showError('Still missing: ' + missing.join(', '));
+    return;
+  }
+
+  // Switch to loading screen
+  $('setup-screen').style.display = 'none';
+  $('loading-screen').style.display = 'flex';
+
+  const loadingMessages = [
+    'Generating your questions via AI...',
+    'Crafting tricky distractors...',
+    'Running quality checks...',
+    'Almost done...'
+  ];
+  let lIdx = 0;
+  $('loading-sub').textContent = loadingMessages[0];
+  const lInterval = setInterval(() => {
+    lIdx = (lIdx + 1) % loadingMessages.length;
+    $('loading-sub').textContent = loadingMessages[lIdx];
+  }, 2500);
+
+  try {
+    const prompt = buildPrompt();
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': state.apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-6',
+        max_tokens: 8000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    clearInterval(lInterval);
+
+    if (!response.ok) {
+      let errMsg = 'API error ' + response.status;
+      try {
+        const errData = await response.json();
+        errMsg = errData.error?.message || errMsg;
+      } catch(e) {}
+      throw new Error(errMsg);
+    }
+
+    const data = await response.json();
+    const raw = data.content.map(function(b) { return b.text || ''; }).join('');
+
+    // Extract JSON robustly
+    let parsed = null;
+
+    // Try 1: find the outermost { ... } block
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (match) {
+      try {
+        parsed = JSON.parse(match[0]);
+      } catch(e1) { /* try next method */ }
+    }
+
+    // Try 2: strip markdown fences
+    if (!parsed) {
+      const stripped = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+      try {
+        parsed = JSON.parse(stripped);
+      } catch(e2) { /* give up */ }
+    }
+
+    if (!parsed) {
+      throw new Error('Could not parse JSON from API response. Try again.');
+    }
+
+    if (!parsed.questions || !Array.isArray(parsed.questions) || parsed.questions.length === 0) {
+      throw new Error('API returned no questions. Try again.');
+    }
+
+    state.questions = parsed.questions;
+    state.currentIdx = 0;
+    state.results = [];
+
+    $('loading-screen').style.display = 'none';
+    startQuiz();
+
+  } catch (err) {
+    clearInterval(lInterval);
+    $('loading-screen').style.display = 'none';
+    $('setup-screen').style.display = 'block';
+    showError('Error: ' + err.message);
+  }
+});
+
+/* ══════════════════════════════════════════════════
+   PROMPT BUILDER
+══════════════════════════════════════════════════ */
+function buildPrompt() {
+  const isMixed = state.qType === 'Mixed';
+  const isMCQ   = state.qType === 'MCQ';
+  const topicList = state.topics.join(', ');
+  const diffLine = state.difficulty === 'Mixed'
+    ? 'Vary difficulty across questions: some easy, some medium, some hard.'
+    : `All questions should be ${state.difficulty} difficulty.`;
+
+  const commonHeader = `You are an expert standardized test question writer.
+Generate high-quality exam questions matching the style and rigor of official ${state.exam} exams.
+
+========================
+📘 EXAM CONTEXT
+========================
+Exam: ${state.exam}
+Topics: ${topicList}
+Difficulty: ${state.difficulty}
+${state.exam === 'AP Biology' ? 'Include stimulus material (data tables, graphs, experimental scenarios) where appropriate.' : ''}
+${state.exam === 'AP Precalculus' ? 'Reflect the 2023-2024 curriculum focus on functions, modeling, and rates of change.' : ''}
+${state.exam === 'SAT' ? 'SAT Math has calculator/no-calculator sections. SAT Reading/Writing questions are passage-based.' : ''}
+${state.exam.includes('AICE') ? 'AICE exams are Cambridge-style with British academic conventions and evaluative thinking.' : ''}
+
+========================
+🎯 REQUIREMENTS
+========================
+- Match the tone and structure of real exam questions
+- Use realistic academic language with multi-step reasoning
+- Ensure all answers are factually correct
+- Distribute questions evenly across all specified topics
+- Each question MUST include a "topic" field (exact string from this list: ${topicList})
+- Difficulty: ${diffLine}
+- Generate exactly ${state.numQ} questions`;
+
+  if (isMixed) {
+    return `${commonHeader}
+
+========================
+🧪 QUESTION TYPE: MIXED
+========================
+Generate approximately half MCQ and half FRQ questions.
+Each question MUST have a "type" field: either "MCQ" or "FRQ".
+
+For MCQ questions include: type, question, choices (4 options, full text, NOT labeled A/B/C/D), correct_answer (exact match), explanation, topic
+For FRQ questions include: type, question, answer (complete model answer), explanation, topic
+
+MCQ rules: one correct answer, plausible distractors, randomize correct answer position.
+FRQ rules: complete precise answers, rubric-style explanation.
+
+========================
+📦 OUTPUT FORMAT (STRICT)
+========================
+Return ONLY valid JSON — no markdown, no extra text.
+{
+  "questions": [
+    { "type": "MCQ", "question": "...", "choices": ["...","...","...","..."], "correct_answer": "...", "explanation": "...", "topic": "..." },
+    { "type": "FRQ", "question": "...", "answer": "...", "explanation": "...", "topic": "..." }
+  ]
+}
+
+🚫 No trailing commas. No text outside the JSON. No Q1/Q2 numbering inside question text. No empty fields.`;
+  }
+
+  return `${commonHeader}
+
+========================
+🧪 QUESTION TYPE: ${state.qType}
+========================
+${isMCQ ? `Each question MUST include: question, choices (4 options, full text, NOT labeled A/B/C/D), correct_answer (exact match to one choice), explanation, topic
+Rules: one correct answer, plausible distractors reflecting common misconceptions, randomize correct answer position.` :
+`Each question MUST include: question, answer (complete model answer), explanation, topic
+Rules: complete precise answers, step-by-step rubric-style explanation.`}
+
+========================
+📦 OUTPUT FORMAT (STRICT)
+========================
+Return ONLY valid JSON — no markdown, no extra text.
+{
+  "questions": [
+    {
+      "question": "...",
+      ${isMCQ ? '"choices": ["...","...","...","..."],\n      "correct_answer": "...",' : '"answer": "...",'}
+      "explanation": "...",
+      "topic": "..."
+    }
+  ]
+}
+
+🚫 No trailing commas. No text outside the JSON. No Q1/Q2 numbering inside question text. No empty fields.`;
+}
+
+/* ══════════════════════════════════════════════════
+   QUIZ
+══════════════════════════════════════════════════ */
+function startQuiz() {
+  // Normalize: ensure every question has a .type field
+  state.questions.forEach(q => { if (!q.type) q.type = state.qType; });
+  $('quiz-screen').style.display = 'block';
+  $('qz-exam').textContent = state.exam;
+  $('qz-type').textContent = state.qType;
+  $('qz-diff').textContent = state.difficulty;
+  $('qz-total').textContent = state.questions.length;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = state.questions[state.currentIdx];
+  const isMCQ = q.type === 'MCQ';
+  const total = state.questions.length;
+  const idx = state.currentIdx;
+
+  // Progress
+  $('progress-bar').style.width = `${(idx / total) * 100}%`;
+  $('qz-current').textContent = idx + 1;
+
+  $('question-num').textContent = `Question ${idx + 1} of ${total}${state.qType === 'Mixed' ? '  ·  ' + q.type : ''}`;
+  $('question-text').textContent = q.question;
+
+  // Reset
+  $('feedback-box').classList.add('hidden');
+  $('next-btn').classList.add('hidden');
+  $('finish-btn').classList.add('hidden');
+
+  if (isMCQ) {
+    $('frq-textarea').classList.add('hidden');
+    $('frq-submit-row').classList.add('hidden');
+    renderChoices(q);
+  } else {
+    $('choices-container').innerHTML = '';
+    $('frq-textarea').classList.remove('hidden');
+    $('frq-submit-row').classList.remove('hidden');
+    $('frq-textarea').value = '';
+    $('frq-textarea').disabled = false;
+    $('frq-submit-btn').disabled = false;
+  }
+
+  startTimer(state.timerSecs);
+}
+
+function renderChoices(q) {
+  const container = $('choices-container');
+  container.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  q.choices.forEach((choice, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    const letterSpan = document.createElement('span');
+    letterSpan.className = 'choice-letter';
+    letterSpan.textContent = letters[i];
+    const textSpan = document.createElement('span');
+    textSpan.textContent = choice;
+    btn.appendChild(letterSpan);
+    btn.appendChild(textSpan);
+    btn.addEventListener('click', () => handleMCQAnswer(choice, q));
+    container.appendChild(btn);
+  });
+}
+
+function handleMCQAnswer(selected, q) {
+  clearTimer();
+  const isCorrect = selected.trim() === q.correct_answer.trim();
+  const buttons = $('choices-container').querySelectorAll('.choice-btn');
+
+  buttons.forEach((btn, i) => {
+    btn.disabled = true;
+    const choiceText = q.choices[i];
+    if (choiceText.trim() === q.correct_answer.trim()) {
+      btn.classList.add('correct');
+    } else if (choiceText === selected && !isCorrect) {
+      btn.classList.add('wrong');
+    }
+  });
+
+  showFeedback(isCorrect ? 'correct' : 'wrong', q.explanation, null);
+  state.results.push({
+    question: q.question,
+    userAnswer: selected,
+    correctAnswer: q.correct_answer,
+    isCorrect,
+    explanation: q.explanation,
+    choices: q.choices,
+    type: 'MCQ',
+    topic: q.topic || ''
+  });
+  showNextOrFinish();
+}
+
+$('frq-submit-btn').addEventListener('click', () => {
+  const q = state.questions[state.currentIdx];
+  const userAns = $('frq-textarea').value.trim();
+  if (!userAns) return;
+  clearTimer();
+  $('frq-textarea').disabled = true;
+  $('frq-submit-btn').disabled = true;
+
+  showFeedback('frq', q.explanation, q.answer);
+  state.results.push({
+    question: q.question,
+    userAnswer: userAns,
+    correctAnswer: q.answer,
+    isCorrect: null, // set after self-grade
+    explanation: q.explanation,
+    type: 'FRQ',
+    topic: q.topic || ''
+  });
+  // Don't advance yet — wait for self-grade buttons
+});
+
+function handleFRQGrade(isCorrect) {
+  state.results[state.results.length - 1].isCorrect = isCorrect;
+  $('frq-grade-yes').disabled = true;
+  $('frq-grade-no').disabled = true;
+  $('frq-grade-row').classList.add('hidden');
+  showNextOrFinish();
+}
+$('frq-grade-yes').addEventListener('click', () => handleFRQGrade(true));
+$('frq-grade-no').addEventListener('click',  () => handleFRQGrade(false));
+
+function showFeedback(type, explanation, modelAnswer) {
+  const box = $('feedback-box');
+  const title = $('feedback-title');
+  const expEl = $('feedback-explanation');
+  const modelEl = $('feedback-model-answer');
+  const gradeRow = $('frq-grade-row');
+
+  box.classList.remove('hidden', 'correct', 'wrong', 'frq');
+  box.classList.add(type);
+
+  if (type === 'correct') {
+    title.textContent = '✅ Correct!';
+  } else if (type === 'wrong') {
+    title.textContent = '❌ Incorrect';
+  } else {
+    title.textContent = '📖 Model Answer & Explanation';
+  }
+
+  if (modelAnswer) {
+    modelEl.classList.remove('hidden');
+    modelEl.textContent = 'Model Answer: ' + modelAnswer;
+  } else {
+    modelEl.classList.add('hidden');
+  }
+  expEl.textContent = explanation;
+
+  // Show self-grade buttons only for FRQ
+  if (type === 'frq') {
+    $('frq-grade-yes').disabled = false;
+    $('frq-grade-no').disabled = false;
+    gradeRow.classList.remove('hidden');
+  } else {
+    gradeRow.classList.add('hidden');
+  }
+}
+
+function showNextOrFinish() {
+  const isLast = state.currentIdx >= state.questions.length - 1;
+  if (isLast) {
+    $('finish-btn').classList.remove('hidden');
+  } else {
+    $('next-btn').classList.remove('hidden');
+  }
+}
+
+$('next-btn').addEventListener('click', () => {
+  state.currentIdx++;
+  renderQuestion();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+$('finish-btn').addEventListener('click', () => {
+  $('quiz-screen').style.display = 'none';
+  showResults();
+});
+
+$('quit-btn').addEventListener('click', () => {
+  if (!confirm('Go back to the main menu? Your current quiz progress will be lost.')) return;
+  $('quiz-screen').style.display = 'none';
+  $('setup-screen').style.display = 'block';
+  // Reset quiz state but keep selections so student can quickly re-generate
+  state.questions = [];
+  state.currentIdx = 0;
+  state.results = [];
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+/* ══════════════════════════════════════════════════
+   RESULTS
+══════════════════════════════════════════════════ */
+function renderTopicBreakdown(results) {
+  const topicMap = {};
+  results.forEach(r => {
+    const t = r.topic || '';
+    if (!t) return;
+    if (!topicMap[t]) topicMap[t] = { correct: 0, total: 0 };
+    topicMap[t].total++;
+    if (r.isCorrect === true) topicMap[t].correct++;
+  });
+  const entries = Object.entries(topicMap);
+  const section = $('topic-breakdown');
+  section.innerHTML = '';
+  if (entries.length < 2) { section.classList.add('hidden'); return; }
+  section.classList.remove('hidden');
+
+  const heading = document.createElement('div');
+  heading.style.cssText = 'font-size:.78rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:12px;';
+  heading.textContent = 'Performance by Topic';
+  section.appendChild(heading);
+
+  const statsDiv = document.createElement('div');
+  statsDiv.className = 'topic-stats';
+  entries.sort((a, b) => (b[1].correct / b[1].total) - (a[1].correct / a[1].total));
+  entries.forEach(([topic, data]) => {
+    const pct = Math.round((data.correct / data.total) * 100);
+    const row = document.createElement('div');
+    row.className = 'topic-stat-row';
+    const name = document.createElement('div');
+    name.className = 'topic-stat-name';
+    name.textContent = topic;
+    name.title = topic;
+    const barWrap = document.createElement('div');
+    barWrap.className = 'topic-stat-bar-wrap';
+    const bar = document.createElement('div');
+    bar.className = 'topic-stat-bar';
+    bar.style.width = pct + '%';
+    bar.style.background = pct >= 75 ? 'var(--green)' : pct >= 50 ? 'var(--accent)' : 'var(--red)';
+    barWrap.appendChild(bar);
+    const num = document.createElement('div');
+    num.className = 'topic-stat-num';
+    num.textContent = `${data.correct}/${data.total}`;
+    row.appendChild(name);
+    row.appendChild(barWrap);
+    row.appendChild(num);
+    statsDiv.appendChild(row);
+  });
+  section.appendChild(statsDiv);
+}
+
+function showResults() {
+  $('results-screen').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  const results = state.results;
+  const correct = results.filter(r => r.isCorrect === true).length;
+  const total = results.length;
+  const mcqTotal = results.filter(r => r.type === 'MCQ').length;
+  const frqTotal = results.filter(r => r.type === 'FRQ').length;
+
+  const ring = $('score-ring');
+  const title = $('results-title');
+  const sub = $('results-sub');
+
+  if (total > 0) {
+    const pct = Math.round((correct / total) * 100);
+    ring.textContent = pct + '%';
+    ring.className = 'score-ring ' + (pct >= 75 ? 'great' : pct >= 50 ? 'ok' : 'poor');
+    ring.style.borderColor = '';
+    title.textContent = pct >= 75 ? 'Great Work! 🎉' : pct >= 50 ? 'Keep Going! 💪' : 'Keep Studying! 📚';
+    const parts = [];
+    if (mcqTotal > 0) parts.push(`${results.filter(r => r.type === 'MCQ' && r.isCorrect).length} of ${mcqTotal} MCQ correct`);
+    if (frqTotal > 0) parts.push(`${results.filter(r => r.type === 'FRQ' && r.isCorrect === true).length} of ${frqTotal} FRQ self-marked correct`);
+    sub.textContent = parts.join(' · ');
+  } else {
+    ring.textContent = '—';
+    ring.className = 'score-ring ok';
+    title.textContent = 'Session Complete';
+    sub.textContent = '';
+  }
+
+  // Save streak & history
+  const streakCount = saveStreak();
+  $('streak-count').textContent = streakCount;
+  $('streak-badge').style.display = 'inline-flex';
+  saveHistory({
+    date: new Date().toLocaleDateString(),
+    exam: state.exam,
+    type: state.qType,
+    difficulty: state.difficulty,
+    numQ: total,
+    correct,
+    pct: total > 0 ? Math.round((correct / total) * 100) : 0
+  });
+
+  // Topic breakdown
+  renderTopicBreakdown(results);
+
+  // Review
+  const section = $('review-section');
+  section.innerHTML = '';
+  results.forEach((r, i) => {
+    const div = document.createElement('div');
+    const cls = r.isCorrect === true ? 'correct' : r.isCorrect === false ? 'wrong' : 'frq-review';
+    div.className = `review-item ${cls}`;
+
+    // Build answer rows safely using DOM
+    const answerRow = document.createElement('div');
+    answerRow.className = 'review-answer-row';
+
+    if (r.type === 'MCQ') {
+      const yourPill = document.createElement('span');
+      yourPill.className = `review-answer-pill ${r.isCorrect ? 'correct' : 'wrong'}`;
+      yourPill.textContent = 'Your answer: ' + r.userAnswer;
+      answerRow.appendChild(yourPill);
+      if (!r.isCorrect) {
+        const correctPill = document.createElement('span');
+        correctPill.className = 'review-answer-pill correct';
+        correctPill.textContent = 'Correct: ' + r.correctAnswer;
+        answerRow.appendChild(correctPill);
+      }
+    } else {
+      const truncated = r.userAnswer.length > 120 ? r.userAnswer.substring(0, 120) + '…' : r.userAnswer;
+      const yourPill = document.createElement('span');
+      yourPill.className = 'review-answer-pill';
+      yourPill.style.cssText = 'background:rgba(91,156,246,.15);color:var(--accent3)';
+      yourPill.textContent = 'Your answer: ' + truncated;
+      answerRow.appendChild(yourPill);
+    }
+
+    // Assemble the review item via safe DOM ops
+    const qNum = document.createElement('div');
+    qNum.className = 'review-q-num';
+    const statusLabel = r.type === 'MCQ'
+      ? (r.isCorrect ? ' · ✅ Correct' : ' · ❌ Incorrect')
+      : (r.isCorrect === true ? ' · ✅ Self-marked correct' : ' · ❌ Self-marked incorrect');
+    qNum.textContent = `Q${i + 1} · ${r.type}${statusLabel}`;
+
+    const qText = document.createElement('div');
+    qText.className = 'review-q-text';
+    qText.textContent = r.question;
+
+    const expDiv = document.createElement('div');
+    expDiv.className = 'review-explanation';
+    const expBold = document.createElement('strong');
+    expBold.textContent = 'Explanation: ';
+    expDiv.appendChild(expBold);
+    expDiv.appendChild(document.createTextNode(r.explanation));
+
+    div.appendChild(qNum);
+    div.appendChild(qText);
+    div.appendChild(answerRow);
+
+    if (r.type === 'FRQ') {
+      const modelBox = document.createElement('div');
+      modelBox.style.cssText = "font-size:.82rem;color:var(--text2);margin-bottom:8px;font-family:'DM Mono',monospace;border:1px solid var(--border);border-radius:6px;padding:8px 12px;background:var(--surface2);";
+      const modelLabel = document.createElement('strong');
+      modelLabel.style.color = 'var(--accent3)';
+      modelLabel.textContent = 'Model Answer: ';
+      modelBox.appendChild(modelLabel);
+      modelBox.appendChild(document.createTextNode(r.correctAnswer));
+      div.appendChild(modelBox);
+    }
+
+    div.appendChild(expDiv);
+    section.appendChild(div);
+  });
+}
+
+$('restart-btn').addEventListener('click', () => {
+  $('results-screen').style.display = 'none';
+  $('setup-screen').style.display = 'block';
+  state = { exam: null, topics: [], qType: null, difficulty: null, numQ: null, timerSecs: state.timerSecs, questions: [], currentIdx: 0, results: [], apiKey: $('api-key-input').value };
+  document.querySelectorAll('.exam-btn').forEach(b => b.classList.remove('selected'));
+  $('topics-card').classList.add('hidden');
+  $('options-card').classList.add('hidden');
+  $('num-card').classList.add('hidden');
+  $('generate-card').classList.add('hidden');
+  hideError();
+  renderHistory();
+  renderStreak();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+$('export-btn').addEventListener('click', () => {
+  const text = buildExportText();
+  const btn = $('export-btn');
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = orig, 2000);
+  }).catch(() => {
+    // Fallback: open in new tab
+    const w = window.open('', '_blank');
+    w.document.write('<pre style="font-family:monospace;padding:20px;white-space:pre-wrap;background:#0d0f14;color:#eef0f6;">' + escapeHTML(text) + '</pre>');
+    w.document.close();
+  });
+});
+
+$('clear-history-btn').addEventListener('click', () => {
+  if (!confirm('Clear all session history?')) return;
+  localStorage.removeItem('quiz_history');
+  renderHistory();
+});
+
+$('new-quiz-btn').addEventListener('click', () => {
+  if (!state.exam) { $('restart-btn').click(); return; }
+  $('results-screen').style.display = 'none';
+  state.questions = [];
+  state.currentIdx = 0;
+  state.results = [];
+  // Re-trigger generate with same settings
+  $('generate-btn').click();
+});
+</script>
+</body>
+</html>
