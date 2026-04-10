@@ -287,6 +287,33 @@
   .choice-btn.correct .choice-letter { background: var(--green); color: #fff; }
   .choice-btn.wrong { border-color: var(--red); background: rgba(224,92,92,.1); }
   .choice-btn.wrong .choice-letter { background: var(--red); color: #fff; }
+  .choice-btn.selected { border-color: var(--accent); background: rgba(240,192,64,.08); }
+  .choice-btn.selected .choice-letter { background: var(--accent); color: #0d0f14; }
+
+  .mt-20 { margin-top: 20px; }
+
+  /* Spelling */
+  .spell-section { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+  .hear-word-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: rgba(91,156,246,.12); color: var(--accent3);
+    border: 1.5px solid var(--accent3); border-radius: var(--radius-sm);
+    padding: 16px 28px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600;
+    transition: all .18s; width: 100%;
+  }
+  .hear-word-btn:hover:not(:disabled) { background: rgba(91,156,246,.22); }
+  .hear-word-btn:disabled { opacity: .5; cursor: not-allowed; }
+  .spell-input {
+    width: 100%;
+    background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); padding: 16px;
+    color: var(--text); font-family: 'DM Mono', monospace; font-size: 1.4rem;
+    letter-spacing: 4px; text-align: center; outline: none;
+    transition: border-color .15s;
+  }
+  .spell-input:focus { border-color: var(--accent3); }
+  .spell-input:disabled { opacity: .6; }
 
   /* FRQ answer */
   .frq-area {
@@ -650,6 +677,18 @@
       <!-- MCQ choices -->
       <div class="choices" id="choices-container"></div>
 
+      <!-- MCQ submit button (appears after selecting a choice) -->
+      <div class="mt-20 hidden" id="mcq-submit-row">
+        <button class="btn-primary" id="mcq-submit-btn" disabled>Submit Answer</button>
+      </div>
+
+      <!-- Spelling section -->
+      <div class="spell-section hidden" id="spelling-section">
+        <button class="hear-word-btn" id="hear-word-btn">🔊 Hear the Word</button>
+        <input type="text" class="spell-input" id="spell-input" placeholder="Type the word you heard…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <button class="btn-primary" id="spelling-submit-btn">Check Spelling</button>
+      </div>
+
       <!-- FRQ textarea -->
       <textarea class="frq-area hidden" id="frq-textarea" placeholder="Write your answer here…"></textarea>
       <div class="mt-20 hidden" id="frq-submit-row">
@@ -730,51 +769,73 @@ const EXAM_TOPICS = {
   "AP Biology": {
     label: "AP",
     topics: [
-      "Cell Structure and Function",
-      "Cell Division: Mitosis & Meiosis",
-      "Energy & Metabolism (Photosynthesis)",
-      "Cellular Respiration & Fermentation",
-      "Genetics & Heredity (Mendelian)",
-      "DNA Structure, Replication & Expression",
-      "Gene Regulation & Biotechnology",
-      "Evolution & Natural Selection",
-      "Ecology: Populations & Communities",
-      "Plant Structure & Function",
-      "Animal Physiology & Homeostasis",
-      "Free Energy & Thermodynamics"
+      "Unit 1: Chemistry of Life (Water Properties, Carbon Chemistry, Macromolecules, Proteins)",
+      "Unit 2: Cells (Cell Structure & Organelles, Membrane Transport, Cell Size & Surface Area)",
+      "Unit 3: Cellular Energetics (Enzymes & Inhibition, Photosynthesis, Cellular Respiration & Fermentation)",
+      "Unit 4: Cell Communication & Cell Cycle (Signal Transduction, Feedback Mechanisms, Mitosis & Regulation)",
+      "Unit 5: Heredity (Meiosis & Genetic Diversity, Mendelian Genetics, Non-Mendelian Genetics)",
+      "Unit 6: Gene Expression & Regulation (DNA Replication, Transcription & RNA Processing, Translation, Mutations, Gene Regulation, Biotechnology)",
+      "Unit 7: Natural Selection (Evolution Mechanisms, Population Genetics, Hardy-Weinberg Equilibrium, Phylogeny & Speciation, Origins of Life)",
+      "Unit 8: Ecology (Behavioral & Physiological Responses, Energy Flow & Biogeochemical Cycles, Population & Community Ecology, Biodiversity, Disruptions)"
     ]
   },
   "AICE International History": {
     label: "AICE",
     display: "International History",
     topics: [
-      "Causes of World War I",
-      "The Paris Peace Conference & Treaty of Versailles",
-      "The Rise of Totalitarianism (Stalin, Hitler, Mussolini)",
-      "Causes of World War II",
-      "The Cold War: Origins & Key Events",
-      "Decolonization & Independence Movements",
-      "The United Nations & International Organizations",
-      "The Korean War",
-      "The Cuban Missile Crisis",
-      "Vietnam War & Proxy Conflicts",
-      "Détente and End of the Cold War"
+      "Empire & World Powers: Economic/Political Motives for New Imperialism, 1870-1900",
+      "Empire & World Powers: Scramble for Africa and Berlin Conference (1884-85)",
+      "Empire & World Powers: Imperial Tensions (Boxer Rebellion, Anglo-German Rivalry over S. Africa)",
+      "Empire & World Powers: Japan as World Power (Sino-Japanese 1894-95, Russo-Japanese 1905, Anglo-Japanese Alliance)",
+      "Empire & World Powers: USA as World Power (Spanish-American War 1898, WWI Entry)",
+      "League 1920s: Peace Settlements 1919-20 (Versailles, Trianon, Neuilly, Saint Germain, Sèvres, Reparations)",
+      "League 1920s: International Tensions 1920-23 (Ruhr Crisis, Corfu Incident, Hyperinflation)",
+      "League 1920s: Improved Relations 1924-29 (Dawes Plan, Locarno Treaties, Kellogg-Briand, Young Plan)",
+      "League 1920s: League Aims, Structure, Agency Successes, and Structural Weaknesses",
+      "League 1930s: Rise of Extremism and Impact on International Relations",
+      "League 1930s: League Failures in the 1930s (Manchuria 1931, Abyssinia 1935-36)",
+      "League 1930s: Appeasement by Britain and France (Rhineland, Anschluss, Munich Crisis 1938)",
+      "League 1930s: Outbreak of War 1939 (Nazi-Soviet Pact, Invasion of Poland)",
+      "China & Japan: Warlord Era 1916-27 (Yuan Shih-kai, May 4th Movement, Kuomintang, Sun Yat-sen, Northern Expedition)",
+      "China & Japan: Chiang Kai-shek vs Communists 1927-36 (Shanghai Massacre, Long March, Xi'an Incident)",
+      "China & Japan: Rise of CCP and Mao Zedong 1936-45 (Yan'an Soviet, War with Japan, Rectification Campaign)",
+      "China & Japan: Japan's Military Dictatorship in the 1930s and Road to WWII"
     ]
   },
   "AICE Psychology": {
     label: "AICE",
     topics: [
-      "Research Methods & Ethics",
-      "Biological Approach to Behavior",
-      "Cognitive Approach: Memory & Thinking",
-      "Behavioral Approach & Learning Theory",
-      "Social Influence & Conformity",
-      "Developmental Psychology",
-      "Abnormal Psychology & Diagnosis",
-      "Treatments & Therapies",
-      "Stress, Health & Coping",
-      "Criminological Psychology",
-      "Relationships & Social Psychology"
+      "Core Study: Dement & Kleitman (1957) — REM Sleep & Dreaming",
+      "Core Study: Hassett et al. (2008) — Sex Differences in Toy Preferences",
+      "Core Study: Hölzel et al. (2011) — Mindfulness & Stress Reduction (MRI)",
+      "Core Study: Andrade (2010) — Doodling & Memory Retention",
+      "Core Study: Baron-Cohen et al. (1997) — Theory of Mind & Autism (Faux Pas Test)",
+      "Core Study: Pozzulo et al. (2010) — Children as Eyewitnesses",
+      "Core Study: Bandura et al. (1961) — Social Learning & Aggression (Bobo Doll)",
+      "Core Study: Fagen et al. (2002) — Operant Conditioning in Elephants",
+      "Core Study: Saavedra & Silverman (2002) — Treating Cockroach Phobia (CBT)",
+      "Core Study: Milgram (1963) — Obedience to Authority",
+      "Core Study: Perry et al. (2012) — Replication of Milgram's Obedience Study",
+      "Core Study: Piliavin et al. (1969) — Bystander Effect (Subway Samaritan)",
+      "Research Methods: Experiments (IV, DV, controls, demand characteristics)",
+      "Research Methods: Self-Reports (questionnaires, interviews, social desirability bias)",
+      "Research Methods: Observations & Case Studies",
+      "Research Methods: Correlations & Longitudinal Studies",
+      "Research Methods: Sampling, Validity, Reliability & Ethics",
+      "Research Methods: Data Analysis (descriptive & inferential statistics)",
+      "Issues & Debates AS: Nature vs. Nurture",
+      "Issues & Debates AS: Ethnocentrism & Cultural Bias in Research",
+      "Issues & Debates AS: Ecological Validity & Generalizability",
+      "Issues & Debates AS: Usefulness of Psychological Research",
+      "Issues & Debates AS: Ethics in Psychological Research",
+      "A Level Clinical Psychology: Schizophrenia, Depression & Phobias (DSM/ICD)",
+      "A Level Consumer Psychology: Advertising, Persuasion & Decision-Making",
+      "A Level Health Psychology: Health Behaviours, Stress Models & Interventions",
+      "A Level Organisational Psychology: Motivation, Leadership & Workplace Stress",
+      "Issues & Debates A Level: Cultural Differences in Psychology",
+      "Issues & Debates A Level: Reductionism vs. Holism",
+      "Issues & Debates A Level: Determinism vs. Free Will",
+      "Issues & Debates A Level: Idiographic vs. Nomothetic Approaches"
     ]
   },
   "SAT": {
@@ -811,6 +872,68 @@ const EXAM_TOPICS = {
       "Word Problems & Problem Solving"
     ]
   },
+  "3rd Grade Science": {
+    label: "GRADE 3",
+    topics: [
+      "Living vs. Non-Living Things",
+      "Plants: Parts, Needs & Life Cycles",
+      "Animals: Habitats & Adaptations",
+      "Food Chains & Ecosystems",
+      "Weather & Seasons",
+      "States of Matter (Solid, Liquid, Gas)",
+      "Forces & Motion (Push, Pull, Magnets)",
+      "Light & Sound",
+      "Earth's Resources (Soil, Water, Air)",
+      "Rocks, Minerals & the Rock Cycle",
+      "The Solar System & Earth's Moon",
+      "Simple Machines & Engineering"
+    ]
+  },
+  "3rd Grade Vocabulary": {
+    label: "GRADE 3",
+    topics: [
+      "Context Clues & Word Meaning",
+      "Synonyms & Antonyms",
+      "Prefixes & Suffixes (un-, re-, -ful, -less)",
+      "Compound Words",
+      "Multiple-Meaning Words (Homonyms)",
+      "Figurative Language (Similes, Metaphors)",
+      "Content Words: Science & Social Studies",
+      "Transition Words & Signal Words",
+      "Shades of Meaning (big → huge → enormous)",
+      "Academic Vocabulary (describe, explain, compare)"
+    ]
+  },
+  "3rd Grade Spelling": {
+    label: "GRADE 3",
+    topics: [
+      "Short Vowel Words (CVC patterns)",
+      "Long Vowel Words (silent-e, vowel teams)",
+      "Consonant Blends & Digraphs",
+      "R-Controlled Vowels (ar, er, ir, or, ur)",
+      "Words with -ing, -ed, -er, -est suffixes",
+      "Compound Words",
+      "Homophones (their/there/they're, to/two/too)",
+      "Frequently Misspelled 3rd Grade Words",
+      "Science & Social Studies Vocabulary Words",
+      "Holiday & Seasonal Theme Words"
+    ]
+  },
+  "3rd Grade Reading Comprehension": {
+    label: "GRADE 3",
+    topics: [
+      "Main Idea & Key Details",
+      "Story Elements (Character, Setting, Plot)",
+      "Sequencing Events",
+      "Making Inferences",
+      "Author's Purpose (Inform, Entertain, Persuade)",
+      "Compare & Contrast",
+      "Cause & Effect",
+      "Fact vs. Opinion",
+      "Text Features (Headings, Captions, Diagrams)",
+      "Summarizing & Retelling"
+    ]
+  },
   "AMC8 (American Math Competition 8)": {
     label: "AMC8",
     topics: [
@@ -832,7 +955,8 @@ let state = {
   questions: [],
   currentIdx: 0,
   results: [],
-  apiKey: ''
+  apiKey: '',
+  selectedChoice: null
 };
 
 /* ══════════════════════════════════════════════════
@@ -1022,16 +1146,29 @@ function clearTimer() {
 
 function handleTimerExpired() {
   const q = state.questions[state.currentIdx];
-  const isMCQ = q.type === 'MCQ';
-  if (isMCQ) {
+  if (q.type === 'MCQ') {
+    $('mcq-submit-row').classList.add('hidden');
     $('choices-container').querySelectorAll('.choice-btn').forEach((btn, i) => {
       btn.disabled = true;
       if (q.choices[i].trim() === q.correct_answer.trim()) btn.classList.add('correct');
     });
+    const selected = state.selectedChoice ? state.selectedChoice.choice : '(time expired)';
     showFeedback('wrong', q.explanation, null);
-    state.results.push({ question: q.question, userAnswer: '(time expired)',
+    state.results.push({ question: q.question, userAnswer: selected,
       correctAnswer: q.correct_answer, isCorrect: false,
       explanation: q.explanation, choices: q.choices, type: 'MCQ', topic: q.topic || '' });
+    showNextOrFinish();
+  } else if (q.type === 'SPELLING') {
+    const userAns = $('spell-input').value.trim() || '(time expired)';
+    $('spell-input').disabled = true;
+    $('spelling-submit-btn').disabled = true;
+    $('hear-word-btn').disabled = true;
+    const correctWord = (q.word || q.correct_answer || '').trim();
+    const isCorrect = userAns.toLowerCase() === correctWord.toLowerCase() && userAns !== '(time expired)';
+    showFeedback(isCorrect ? 'correct' : 'wrong', q.explanation, correctWord);
+    state.results.push({ question: q.question, userAnswer: userAns,
+      correctAnswer: correctWord, isCorrect,
+      explanation: q.explanation, type: 'SPELLING', topic: q.topic || '' });
     showNextOrFinish();
   } else {
     const userAns = $('frq-textarea').value.trim() || '(time expired)';
@@ -1286,11 +1423,12 @@ $('generate-btn').addEventListener('click', async () => {
   $('loading-screen').style.display = 'flex';
 
   const loadingMessages = [
-    'Generating your questions via AI...',
-    'Crafting tricky distractors...',
-    'Running quality checks...',
-    'Almost done...'
+  'Cooking up some brain-boosting questions just for YOU 🧠✨...',
+  'Sneaking in a few trick questions… don’t fall for it 😏...',
+  'Double-checking to make sure this isn’t too easy for you 😄...',
+  'Almost ready… get your thinking cap on 🎓🔥!'
   ];
+  
   let lIdx = 0;
   $('loading-sub').textContent = loadingMessages[0];
   const lInterval = setInterval(() => {
@@ -1310,7 +1448,7 @@ $('generate-btn').addEventListener('click', async () => {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-6',
+        model: 'claude-sonnet-4-6',
         max_tokens: 8000,
         messages: [{ role: 'user', content: prompt }]
       })
@@ -1373,9 +1511,144 @@ $('generate-btn').addEventListener('click', async () => {
 });
 
 /* ══════════════════════════════════════════════════
+   FRQ INSTRUCTIONS BUILDER
+══════════════════════════════════════════════════ */
+function buildFRQInstructions() {
+  if (state.exam === 'AP Biology') {
+    return `Each AP Biology FRQ MUST follow the official College Board format with multi-part structure and rubric-style scoring.
+
+QUESTION field required structure:
+Begin with a 2-3 sentence experimental or biological scenario that includes specific quantitative data (e.g., concentration values, percentages, time points, survival rates, or a data table description).
+
+For LONG FRQ (9 points total) — use this structure:
+Part A (1 point)
+[One task using an AP task verb: Describe / Identify / Explain]
+
+Part B (3 points)
+i. [Task]
+ii. [Task]
+iii. [Task — typically a Justify or Explain task connecting evidence to biological principle]
+
+Part C (3 points)
+i. [Data analysis task — describe a trend or pattern from the scenario data]
+ii. [Second data task — comparison or identification]
+iii. [Calculation task — compute a specific value using numbers provided in the scenario]
+
+Part D (2 points)
+i. Predict [what would happen to X if Y changed].
+ii. Justify your prediction using biological reasoning.
+
+For SHORT FRQ (4 points total) — use this structure:
+Part A (1 point): [One brief task]
+Part B (1 point): [One brief task]
+Part C (1 point): [One brief task — can be a calculation]
+Part D (1 point): [One prediction or justification task]
+
+Generate a realistic mix: if generating multiple FRQs, include both long (9-pt) and short (4-pt) types.
+
+ANSWER field required structure — write as an AP-style RUBRIC SCORING GUIDE:
+SCORING GUIDE (Total: [X] points)
+
+Part A (1 point):
+• ACCEPT: [Specific criterion — the exact concept, relationship, or fact the student must state to earn the point]
+
+Part B (3 points):
+i. (1 point): [Specific acceptable answer — what must be written/stated]
+ii. (1 point): [Specific acceptable answer]
+iii. (1 point): [Justification criterion — e.g., "Student must connect [specific factor] to [specific biological outcome]"]
+
+Part C (3 points):
+i. (1 point): [Data pattern criterion — e.g., "Student must correctly identify that Group A had higher X than Group B"]
+ii. (1 point): [Description criterion]
+iii. (1 point) [Calculation]: Correct answer: [value with units]. Acceptable range: [lower]–[upper]
+
+Part D (2 points):
+i. (1 point): [Prediction criterion — ACCEPT any response that correctly states [specific predicted change]]
+ii. (1 point): [Justification criterion — student must reference [specific biological mechanism] to earn this point]
+
+EXPLANATION field: State which AP Biology Units and Science Practices are assessed (e.g., Unit 3, SP 4.B, SP 6.E).`;
+  }
+  if (state.exam === 'AP Precalculus') {
+    return `Each AP Precalculus FRQ MUST follow the official College Board format with labeled parts and rubric-style scoring.
+
+QUESTION field required structure:
+Start with a clear function definition or real-world context (1-2 sentences). For modeling or table-based questions, provide specific numerical data values.
+
+(a) (X points) [Specific mathematical task]
+(b) (X points) [Specific mathematical task]
+(c) (X points) [Specific mathematical task]
+(d) (X points) [Additional mathematical task — include if problem complexity warrants it]
+
+Common task types: finding zeros/extrema/average rate of change, determining end behavior/asymptotes, writing equations from data/graphs, interpreting parameters in context, function transformations, solving exponential/log/trig equations.
+
+ANSWER field required structure — write as an AP-style RUBRIC SCORING GUIDE:
+SCORING GUIDE (Total: [X] points)
+
+(a) (X points):
+• (1 point): [Method/setup criterion — what the student must show or demonstrate]
+• (1 point): [Final answer criterion] ACCEPT: [specific algebraic expression or numerical value with units]
+Note: Award full credit for correct answer without shown work for 1-point parts.
+
+(b) (X points):
+• (1 point): [Criterion — what constitutes a correct response for this part]
+• ACCEPT: [specific answer or algebraic equivalent]
+
+(c) (X points):
+• (1 point): [Primary criterion — method or setup]
+• (1 point): [Final answer criterion]
+Note: Apply consequential error policy — award method credit if the setup is correct despite an arithmetic error.
+
+(d) (X points, if applicable):
+• (1 point): [Criterion]
+• ACCEPT: [specific answer]
+
+EXPLANATION field: Identify the AP Precalculus Units and Mathematical Practices assessed.`;
+  }
+  if (state.exam === 'AICE International History') {
+    return `Each AICE International History FRQ must follow the Cambridge AS Level essay format.
+
+QUESTION field — use Cambridge-style essay question stems:
+- "Why did [X] happen?" (causation)
+- "How far/successful was [Y]?" (evaluation)
+- "To what extent did [Z] cause/change [W]?" (evaluation)
+- "Account for [event]" (explanation of causes/factors)
+
+Each question must relate to one of the four Cambridge 9489 syllabus topics (1870-1945):
+1. Empire and Emergence of World Powers, 1870-1919
+2. League of Nations and International Relations in the 1920s
+3. League of Nations and International Relations in the 1930s
+4. China and Japan, 1912-1945
+
+ANSWER field — write as a structured Cambridge essay guide:
+ESSAY GUIDE (Cambridge AS Level Standard)
+
+[Introduction criterion]: State a clear argument/thesis directly addressing the question.
+
+[Factor 1]: [Key cause/factor] — explain how/why this factor contributed. Cite: [specific evidence]
+
+[Factor 2]: [Second key factor] — explain its role. Cite: [specific evidence]
+
+[Factor 3/Counterargument]: [Third factor or opposing view]
+
+[Evaluative conclusion]: Weigh the relative importance of factors. Identify the most significant factor and justify.
+
+Key factual points to address for a strong answer: [3-4 specific historical facts]
+
+EXPLANATION field: Identify the Cambridge historical concepts assessed (cause/consequence, change/continuity, significance).`;
+  }
+  return `Each question MUST include: question, answer (complete model answer), explanation, topic
+Rules: complete precise answers, step-by-step rubric-style explanation.`;
+}
+
+/* ══════════════════════════════════════════════════
    PROMPT BUILDER
 ══════════════════════════════════════════════════ */
 function buildPrompt() {
+  // Special standalone prompt for spelling exams
+  if (state.exam === '3rd Grade Spelling') {
+    return buildSpellingPrompt();
+  }
+
   const isMixed = state.qType === 'Mixed';
   const isMCQ   = state.qType === 'MCQ';
   const topicList = state.topics.join(', ');
@@ -1396,6 +1669,10 @@ ${state.exam === 'AP Biology' ? 'Include stimulus material (data tables, graphs,
 ${state.exam === 'AP Precalculus' ? 'Reflect the 2023-2024 curriculum focus on functions, modeling, and rates of change.' : ''}
 ${state.exam === 'SAT' ? 'SAT Math has calculator/no-calculator sections. SAT Reading/Writing questions are passage-based.' : ''}
 ${state.exam.includes('AICE') ? 'AICE exams are Cambridge-style with British academic conventions and evaluative thinking.' : ''}
+${state.exam === 'AICE Psychology' ? 'CRITICAL: Questions MUST reference the Cambridge 9990 core studies by author name and year (e.g., Milgram 1963, Bandura et al. 1961). Align strictly with the Cambridge AS & A Level Psychology 9990 syllabus. Do NOT invent studies.' : ''}
+${state.exam === 'AICE International History' ? 'CRITICAL: AICE International History covers Cambridge 9489 International History (1870-1945). Questions must relate to one of four topics: (1) Empire and World Powers 1870-1919, (2) League of Nations in the 1920s, (3) League of Nations in the 1930s, (4) China and Japan 1912-45. FRQ uses Cambridge essay stems: "Why did...", "How far/successful...", "To what extent...", "Account for...". Answers should evaluate causes and relative importance of factors.' : ''}
+${state.exam.includes('3rd Grade') ? 'Use simple vocabulary and concepts appropriate for 8-9 year olds. Keep questions encouraging and age-appropriate.' : ''}
+${state.exam === '3rd Grade Reading Comprehension' ? 'IMPORTANT: Each question MUST start with a short reading passage (3-6 age-appropriate sentences), followed by a comprehension question about it. Include the full passage in the question field before the question.' : ''}
 
 ========================
 🎯 REQUIREMENTS
@@ -1444,8 +1721,7 @@ Return ONLY valid JSON — no markdown, no extra text.
 ========================
 ${isMCQ ? `Each question MUST include: question, choices (4 options, full text, NOT labeled A/B/C/D), correct_answer (exact match to one choice), explanation, topic
 Rules: one correct answer, plausible distractors reflecting common misconceptions, randomize correct answer position.` :
-`Each question MUST include: question, answer (complete model answer), explanation, topic
-Rules: complete precise answers, step-by-step rubric-style explanation.`}
+buildFRQInstructions()}
 
 ========================
 📦 OUTPUT FORMAT (STRICT)
@@ -1463,6 +1739,48 @@ Return ONLY valid JSON — no markdown, no extra text.
 }
 
 🚫 No trailing commas. No text outside the JSON. No Q1/Q2 numbering inside question text. No empty fields.`;
+}
+
+function buildSpellingPrompt() {
+  const topicList = state.topics.join(', ');
+  return `You are an expert 3rd grade spelling teacher creating a spelling test.
+Generate exactly ${state.numQ} spelling questions for 3rd graders (ages 8-9).
+
+========================
+📘 CONTEXT
+========================
+Grade Level: 3rd Grade
+Topics (word categories): ${topicList}
+Distribute words evenly across all specified topics.
+
+========================
+🎯 REQUIREMENTS
+========================
+- Choose age-appropriate words commonly taught in 3rd grade
+- For each word, write a natural sentence using the word but replace it with "___"
+- The sentence gives context clues about the word's meaning
+- Include a short explanation with the correct spelling letter-by-letter (e.g., "F-L-O-W-E-R")
+- Vary word difficulty slightly (some easier, some harder) across the set
+- Do NOT use the same word twice
+
+========================
+📦 OUTPUT FORMAT (STRICT)
+========================
+Return ONLY valid JSON — no markdown, no extra text.
+{
+  "questions": [
+    {
+      "type": "SPELLING",
+      "question": "Fill in the blank with the correct spelling.\\nSentence: 'The ___ bloomed in the garden and smelled wonderful.'",
+      "word": "flower",
+      "explanation": "The word is FLOWER. F-L-O-W-E-R. A flower is the part of a plant that blooms and often has colorful petals.",
+      "topic": "Nature Words"
+    }
+  ]
+}
+
+🚫 The "word" field must contain ONLY the lowercase word to spell — no punctuation, no spaces.
+🚫 No trailing commas. No text outside the JSON. No empty fields.`;
 }
 
 /* ══════════════════════════════════════════════════
@@ -1497,10 +1815,30 @@ function renderQuestion() {
   $('next-btn').classList.add('hidden');
   $('finish-btn').classList.add('hidden');
 
-  if (isMCQ) {
-    $('frq-textarea').classList.add('hidden');
-    $('frq-submit-row').classList.add('hidden');
+  const isSpelling = q.type === 'SPELLING';
+
+  // Hide all input sections first
+  $('frq-textarea').classList.add('hidden');
+  $('frq-submit-row').classList.add('hidden');
+  $('spelling-section').classList.add('hidden');
+  $('mcq-submit-row').classList.add('hidden');
+  $('spell-input').value = '';
+  $('spell-input').disabled = false;
+  $('spelling-submit-btn').disabled = false;
+  $('hear-word-btn').disabled = false;
+  state.selectedChoice = null;
+  $('mcq-submit-btn').disabled = true;
+
+  if (isSpelling) {
+    $('choices-container').innerHTML = '';
+    $('spelling-section').classList.remove('hidden');
+    // Auto-speak the word after a short delay so the student is ready
+    setTimeout(() => {
+      speakWord(q.word || q.correct_answer || '');
+    }, 600);
+  } else if (isMCQ) {
     renderChoices(q);
+    $('mcq-submit-row').classList.remove('hidden');
   } else {
     $('choices-container').innerHTML = '';
     $('frq-textarea').classList.remove('hidden');
@@ -1527,13 +1865,25 @@ function renderChoices(q) {
     textSpan.textContent = choice;
     btn.appendChild(letterSpan);
     btn.appendChild(textSpan);
-    btn.addEventListener('click', () => handleMCQAnswer(choice, q));
+    btn.addEventListener('click', () => handleMCQSelect(choice, q, btn));
     container.appendChild(btn);
   });
 }
 
+function handleMCQSelect(choice, q, clickedBtn) {
+  // Remove selection highlight from all buttons
+  $('choices-container').querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+  // Highlight the clicked button
+  clickedBtn.classList.add('selected');
+  // Store selection (don't lock in yet)
+  state.selectedChoice = { choice, q };
+  // Enable the submit button
+  $('mcq-submit-btn').disabled = false;
+}
+
 function handleMCQAnswer(selected, q) {
   clearTimer();
+  $('mcq-submit-row').classList.add('hidden');
   const isCorrect = selected.trim() === q.correct_answer.trim();
   const buttons = $('choices-container').querySelectorAll('.choice-btn');
 
@@ -1560,6 +1910,12 @@ function handleMCQAnswer(selected, q) {
   });
   showNextOrFinish();
 }
+
+$('mcq-submit-btn').addEventListener('click', () => {
+  if (!state.selectedChoice) return;
+  const { choice, q } = state.selectedChoice;
+  handleMCQAnswer(choice, q);
+});
 
 $('frq-submit-btn').addEventListener('click', () => {
   const q = state.questions[state.currentIdx];
@@ -1591,6 +1947,50 @@ function handleFRQGrade(isCorrect) {
 }
 $('frq-grade-yes').addEventListener('click', () => handleFRQGrade(true));
 $('frq-grade-no').addEventListener('click',  () => handleFRQGrade(false));
+
+function speakWord(word) {
+  if (!word || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(word);
+  utt.rate = 0.8;
+  utt.pitch = 1;
+  window.speechSynthesis.speak(utt);
+}
+
+$('hear-word-btn').addEventListener('click', () => {
+  const q = state.questions[state.currentIdx];
+  speakWord(q.word || q.correct_answer || '');
+});
+
+// Allow pressing Enter in the spell input to submit
+$('spell-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') $('spelling-submit-btn').click();
+});
+
+$('spelling-submit-btn').addEventListener('click', () => {
+  const q = state.questions[state.currentIdx];
+  const userAns = $('spell-input').value.trim();
+  if (!userAns) return;
+  clearTimer();
+  $('spell-input').disabled = true;
+  $('spelling-submit-btn').disabled = true;
+  $('hear-word-btn').disabled = true;
+
+  const correctWord = (q.word || q.correct_answer || '').trim();
+  const isCorrect = userAns.toLowerCase() === correctWord.toLowerCase();
+
+  showFeedback(isCorrect ? 'correct' : 'wrong', q.explanation, correctWord);
+  state.results.push({
+    question: q.question,
+    userAnswer: userAns,
+    correctAnswer: correctWord,
+    isCorrect,
+    explanation: q.explanation,
+    type: 'SPELLING',
+    topic: q.topic || ''
+  });
+  showNextOrFinish();
+});
 
 function showFeedback(type, explanation, modelAnswer) {
   const box = $('feedback-box');
@@ -1720,6 +2120,7 @@ function showResults() {
   const total = results.length;
   const mcqTotal = results.filter(r => r.type === 'MCQ').length;
   const frqTotal = results.filter(r => r.type === 'FRQ').length;
+  const spellingTotal = results.filter(r => r.type === 'SPELLING').length;
 
   const ring = $('score-ring');
   const title = $('results-title');
@@ -1733,6 +2134,7 @@ function showResults() {
     title.textContent = pct >= 75 ? 'Great Work! 🎉' : pct >= 50 ? 'Keep Going! 💪' : 'Keep Studying! 📚';
     const parts = [];
     if (mcqTotal > 0) parts.push(`${results.filter(r => r.type === 'MCQ' && r.isCorrect).length} of ${mcqTotal} MCQ correct`);
+    if (spellingTotal > 0) parts.push(`${results.filter(r => r.type === 'SPELLING' && r.isCorrect).length} of ${spellingTotal} spelling correct`);
     if (frqTotal > 0) parts.push(`${results.filter(r => r.type === 'FRQ' && r.isCorrect === true).length} of ${frqTotal} FRQ self-marked correct`);
     sub.textContent = parts.join(' · ');
   } else {
@@ -1782,6 +2184,17 @@ function showResults() {
         correctPill.textContent = 'Correct: ' + r.correctAnswer;
         answerRow.appendChild(correctPill);
       }
+    } else if (r.type === 'SPELLING') {
+      const yourPill = document.createElement('span');
+      yourPill.className = `review-answer-pill ${r.isCorrect ? 'correct' : 'wrong'}`;
+      yourPill.textContent = 'You spelled: ' + r.userAnswer;
+      answerRow.appendChild(yourPill);
+      if (!r.isCorrect) {
+        const correctPill = document.createElement('span');
+        correctPill.className = 'review-answer-pill correct';
+        correctPill.textContent = 'Correct: ' + r.correctAnswer;
+        answerRow.appendChild(correctPill);
+      }
     } else {
       const truncated = r.userAnswer.length > 120 ? r.userAnswer.substring(0, 120) + '…' : r.userAnswer;
       const yourPill = document.createElement('span');
@@ -1794,7 +2207,7 @@ function showResults() {
     // Assemble the review item via safe DOM ops
     const qNum = document.createElement('div');
     qNum.className = 'review-q-num';
-    const statusLabel = r.type === 'MCQ'
+    const statusLabel = r.type === 'MCQ' || r.type === 'SPELLING'
       ? (r.isCorrect ? ' · ✅ Correct' : ' · ❌ Incorrect')
       : (r.isCorrect === true ? ' · ✅ Self-marked correct' : ' · ❌ Self-marked incorrect');
     qNum.textContent = `Q${i + 1} · ${r.type}${statusLabel}`;
@@ -1833,7 +2246,7 @@ function showResults() {
 $('restart-btn').addEventListener('click', () => {
   $('results-screen').style.display = 'none';
   $('setup-screen').style.display = 'block';
-  state = { exam: null, topics: [], qType: null, difficulty: null, numQ: null, timerSecs: state.timerSecs, questions: [], currentIdx: 0, results: [], apiKey: $('api-key-input').value };
+  state = { exam: null, topics: [], qType: null, difficulty: null, numQ: null, timerSecs: state.timerSecs, questions: [], currentIdx: 0, results: [], apiKey: $('api-key-input').value, selectedChoice: null };
   document.querySelectorAll('.exam-btn').forEach(b => b.classList.remove('selected'));
   $('topics-card').classList.add('hidden');
   $('options-card').classList.add('hidden');
