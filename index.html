@@ -263,6 +263,7 @@
     font-size: clamp(1.05rem, 2.5vw, 1.22rem);
     line-height: 1.6; color: var(--text);
     margin-bottom: 28px;
+    white-space: pre-line;
   }
 
   /* MCQ choices */
@@ -324,6 +325,7 @@
     color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .9rem;
     line-height: 1.6; resize: vertical; min-height: 120px; outline: none;
     transition: border-color .15s;
+    white-space: pre-line;
   }
   .frq-area:focus { border-color: var(--accent3); }
 
@@ -347,9 +349,9 @@
   .feedback-box.frq .feedback-title { color: var(--accent3); }
   .feedback-model-answer {
     font-size: .82rem; color: var(--text2); margin-bottom: 6px;
-    font-family: 'DM Mono', monospace;
+    font-family: 'DM Mono', monospace; white-space: pre-line;
   }
-  .feedback-explanation { font-size: .88rem; color: var(--text); line-height: 1.6; }
+  .feedback-explanation { font-size: .88rem; color: var(--text); line-height: 1.6; white-space: pre-line; }
 
   .quiz-actions { display: flex; gap: 12px; margin-top: 20px; align-items: center; }
 
@@ -388,7 +390,7 @@
   .review-item.wrong { border-left-color: var(--red); }
   .review-item.frq-review { border-left-color: var(--accent3); }
   .review-q-num { font-size: .75rem; font-family: 'DM Mono', monospace; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-  .review-q-text { font-family: 'Playfair Display', serif; font-size: 1rem; line-height: 1.5; margin-bottom: 12px; }
+  .review-q-text { font-family: 'Playfair Display', serif; font-size: 1rem; line-height: 1.5; margin-bottom: 12px; white-space: pre-line; }
   .review-answer-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
   .review-answer-pill {
     font-size: .78rem; font-family: 'DM Mono', monospace;
@@ -396,7 +398,7 @@
   }
   .review-answer-pill.correct { background: rgba(76,175,125,.15); color: var(--green); }
   .review-answer-pill.wrong { background: rgba(224,92,92,.15); color: var(--red); }
-  .review-explanation { font-size: .87rem; color: var(--text2); line-height: 1.6; border-top: 1px solid var(--border); padding-top: 10px; margin-top: 4px; }
+  .review-explanation { font-size: .87rem; color: var(--text2); line-height: 1.6; border-top: 1px solid var(--border); padding-top: 10px; margin-top: 4px; white-space: pre-line; }
 
   .results-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
 
@@ -2002,7 +2004,7 @@ function showResults() {
 
     if (r.type === 'FRQ') {
       const modelBox = document.createElement('div');
-      modelBox.style.cssText = "font-size:.82rem;color:var(--text2);margin-bottom:8px;font-family:'DM Mono',monospace;border:1px solid var(--border);border-radius:6px;padding:8px 12px;background:var(--surface2);";
+      modelBox.style.cssText = "font-size:.82rem;color:var(--text2);margin-bottom:8px;font-family:'DM Mono',monospace;border:1px solid var(--border);border-radius:6px;padding:8px 12px;background:var(--surface2);white-space:pre-line;";
       const modelLabel = document.createElement('strong');
       modelLabel.style.color = 'var(--accent3)';
       modelLabel.textContent = 'Model Answer: ';

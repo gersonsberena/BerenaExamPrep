@@ -106,10 +106,16 @@ window.BERENA_CONFIG = {
 QUESTION field required structure:
 Start with a clear function definition or real-world context (1-2 sentences). For modeling or table-based questions, provide specific numerical data values.
 
+- Add a blank line after the question context, then list each part (a), (b), (c), (d) on separate lines with blank lines between them. 
+Each part should be a specific mathematical task (e.g., "Find the inverse function", "Calculate the average rate of change", "Determine the amplitude and period", 
+"Solve for x using logarithmic properties").
+
 (a) (X points) [Specific mathematical task]
 (b) (X points) [Specific mathematical task]
 (c) (X points) [Specific mathematical task]
 (d) (X points) [Additional mathematical task — include if problem complexity warrants it]
+
+- Make it readable and well-spaced
 
 ANSWER field required structure — write as an AP-style RUBRIC SCORING GUIDE:
 SCORING GUIDE (Total: [X] points)
@@ -156,6 +162,12 @@ For SHORT FRQ (4 points total):
 Part A-D (1 point each): [One brief task per part]
 
 Generate a mix of long (9-pt) and short (4-pt) types.
+
+Format the question as follows:
+- Start with the problem context paragraph
+- Add a blank line
+- Then list each part (a), (b), (c), (d) on separate lines with blank lines between them
+- Make it readable and well-spaced
 
 ANSWER field — write as AP-style RUBRIC SCORING GUIDE with ACCEPT criteria for each part.
 
