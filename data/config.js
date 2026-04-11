@@ -356,11 +356,15 @@ EXPLANATION field: Identify Cambridge historical concepts assessed (cause/conseq
       // The spellingPromptInstructions below is sent to Claude for sentence generation.
       spellingPromptInstructions: `You are an expert 3rd grade spelling teacher.
 
-For each word in the provided list, write ONE fill-in-the-blank sentence that:
-- Is appropriate for 3rd graders (ages 8-10)
-- Gives clear context clues so the student understands the word's meaning
-- Replaces the word with ___
-- Also includes a short spelling explanation (e.g., letter breakdown or pattern tip)
+For each word in the provided list, write ONE fill-in-the-blank sentence and include its definition and part of speech.
+
+Requirements:
+- Sentence is appropriate for 3rd graders (ages 8-10)
+- Sentence gives clear context clues so the student understands the word's meaning
+- Replace the word with ___
+- Include the part of speech (e.g., noun, verb, adjective, adverb, etc.)
+- Include a short, simple definition a 3rd grader can understand
+- Include a short spelling explanation (e.g., letter breakdown or pattern tip)
 
 Return ONLY valid JSON — no markdown, no extra text:
 {
@@ -368,7 +372,9 @@ Return ONLY valid JSON — no markdown, no extra text:
     {
       "word": "away",
       "question": "The bird flew ___ from the nest when it heard a loud noise.",
-      "explanation": "AWAY: A-W-A-Y. 'Away' means to move to a different place."
+      "partOfSpeech": "adverb",
+      "definition": "to or at a distance from a place or person",
+      "explanation": "AWAY: A-W-A-Y. Think of 'away' as 'a' + 'way' — going on a way (path) from here."
     }
   ]
 }`
@@ -401,6 +407,136 @@ Return ONLY valid JSON — no markdown, no extra text:
         "AMC8"
       ],
       frqInstructions: "Each question MUST include: question, answer (complete model answer), explanation, topic\nRules: complete precise answers, step-by-step rubric-style explanation."
+    },
+
+    // ── RIDDLES ───────────────────────────────────────────────────────────────
+    "Riddles: Kids": {
+      label: "RIDDLES",
+      noTopics: true,
+      noQuestionType: true,
+      noDifficulty: true,
+      frqInstructions: `You are an expert riddle writer for children ages 6–12.
+
+Generate fun, age-appropriate riddles with a single short definitive answer.
+
+Rules:
+- Use wordplay, double meanings, or simple logic
+- Keep language simple — no adult themes, no scary content
+- Each riddle must have ONE clear correct answer
+- The explanation should reveal the trick or wordplay in a fun, encouraging way
+- Riddles should be varied: some about animals, objects, nature, food, everyday things
+- Do NOT repeat similar riddle structures back-to-back
+
+Each question MUST include: question (the riddle), answer (short, exact answer), explanation (reveal the trick), topic
+
+Return ONLY valid JSON — no markdown, no extra text:
+{
+  "questions": [
+    {
+      "question": "I have hands but I cannot clap. What am I?",
+      "answer": "A clock",
+      "explanation": "A clock has 'hands' — the hour and minute hands that point to the time — but they can't actually clap! It's a play on the word 'hands.'",
+      "topic": "Riddles: Kids"
+    }
+  ]
+}`
+    },
+
+    "Riddles: Adults": {
+      label: "RIDDLES",
+      noTopics: true,
+      noQuestionType: true,
+      noDifficulty: true,
+      frqInstructions: `You are an expert riddle writer for teens and adults.
+
+Generate clever, witty riddles that require lateral thinking, wordplay, or abstract reasoning.
+
+Rules:
+- Riddles should be genuinely challenging — not solvable with a quick guess
+- Use misdirection, metaphor, or unexpected logic
+- Each riddle must have ONE clear correct answer
+- The explanation should fully unpack the reasoning or wordplay
+- Vary the style: some lateral thinking, some wordplay, some logic-based, some philosophical
+- Avoid riddles that are well-known clichés (e.g. "I speak without a mouth" — too common)
+
+Each question MUST include: question (the riddle), answer (short, exact answer), explanation (full reveal of the reasoning), topic
+
+Return ONLY valid JSON — no markdown, no extra text:
+{
+  "questions": [
+    {
+      "question": "The more you take, the more you leave behind. What am I?",
+      "answer": "Footsteps",
+      "explanation": "Each step you take leaves a footprint behind you, yet the act of taking more steps means you leave even more footprints. The riddle plays on two meanings of 'take' — taking a step and taking an object.",
+      "topic": "Riddles: Adults"
+    }
+  ]
+}`
+    },
+
+    // ── MATH PUZZLES ─────────────────────────────────────────────────────────
+    "Math Puzzles: Kids": {
+      label: "MATH PUZZLES",
+      noTopics: true,
+      noQuestionType: true,
+      noDifficulty: true,
+      frqInstructions: `You are an expert math puzzle writer for children ages 6–12.
+
+Generate fun, engaging number and logic puzzles with a single short definitive answer.
+
+Rules:
+- Use simple arithmetic, patterns, or basic logic (addition, subtraction, multiplication, simple sequences)
+- Keep the numbers and concepts appropriate for ages 6–12
+- Each puzzle must have ONE clear correct numerical or short-word answer
+- The explanation should walk through the solution step by step in a friendly, encouraging tone
+- Vary puzzle types: number riddles, "what number am I?", simple sequences, shape counting, pattern completion
+- Make them feel like fun games, not school tests
+
+Each question MUST include: question (the puzzle), answer (short exact answer), explanation (step-by-step friendly solution), topic
+
+Return ONLY valid JSON — no markdown, no extra text:
+{
+  "questions": [
+    {
+      "question": "I am a number between 10 and 20. If you add my two digits together, you get 7. What number am I?",
+      "answer": "16",
+      "explanation": "We need a number between 10 and 20 whose digits add up to 7. Let's check: 1+6 = 7 ✓. So the answer is 16! (We can also check 25, but that's not between 10 and 20.)",
+      "topic": "Math Puzzles: Kids"
+    }
+  ]
+}`
+    },
+
+    "Math Puzzles: Adults": {
+      label: "MATH PUZZLES",
+      noTopics: true,
+      noQuestionType: true,
+      noDifficulty: true,
+      frqInstructions: `You are an expert math puzzle writer for teens and adults.
+
+Generate challenging number puzzles, logic problems, and mathematical brain teasers with a single definitive answer.
+
+Rules:
+- Puzzles should require multi-step reasoning, pattern recognition, or creative mathematical thinking
+- May involve sequences, operations, algebra concepts, geometry intuition, or lateral math thinking
+- Each puzzle must have ONE clear correct answer (a number, expression, or short phrase)
+- The explanation should give a clear, complete step-by-step solution
+- Vary types: number sequences, missing operations, "what am I?" number riddles, logic grids described in text, visual pattern rules described in words
+- Avoid trivial arithmetic — puzzles should make the solver think
+
+Each question MUST include: question (the puzzle), answer (exact answer), explanation (rigorous step-by-step solution), topic
+
+Return ONLY valid JSON — no markdown, no extra text:
+{
+  "questions": [
+    {
+      "question": "A farmer has 17 sheep. All but 9 run away. How many sheep does the farmer have left?",
+      "answer": "9",
+      "explanation": "The key is the phrase 'all but 9.' This means all the sheep except 9 ran away. So 9 sheep remain. Many people rush to subtract and say 8, but re-reading carefully reveals the answer is simply 9.",
+      "topic": "Math Puzzles: Adults"
+    }
+  ]
+}`
     }
 
   } // end exams
