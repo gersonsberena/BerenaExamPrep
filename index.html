@@ -316,6 +316,29 @@
   }
   .spell-input:focus { border-color: var(--accent3); }
   .spell-input:disabled { opacity: .6; }
+  .spell-definition {
+    background: rgba(91,156,246,.07); border: 1.5px solid var(--accent3);
+    border-radius: var(--radius-sm); padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .spell-def-meta {
+    font-size: .8rem; color: var(--accent3); font-weight: 700;
+    text-transform: uppercase; letter-spacing: .08em;
+  }
+  .spell-def-text {
+    font-size: 1rem; color: var(--text); line-height: 1.5;
+  }
+  .hear-def-btn {
+    align-self: flex-start;
+    display: flex; align-items: center; gap: 7px;
+    background: transparent; color: var(--accent3);
+    border: 1px solid var(--accent3); border-radius: 6px;
+    padding: 6px 14px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 600;
+    transition: background .15s;
+  }
+  .hear-def-btn:hover:not(:disabled) { background: rgba(91,156,246,.15); }
+  .hear-def-btn:disabled { opacity: .45; cursor: not-allowed; }
 
   /* FRQ answer */
   .frq-area {
@@ -584,9 +607,9 @@
         </div>
       </div>
 
-      <div class="section-sep"></div>
+      <div class="section-sep" id="diff-sep"></div>
 
-      <div>
+      <div id="difficulty-section">
         <div style="font-size:.82rem;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;">Difficulty</div>
         <div class="options-row" id="diff-row">
           <button class="opt-btn" data-val="Easy">🟢 Easy</button>
@@ -688,6 +711,11 @@
       <!-- Spelling section -->
       <div class="spell-section hidden" id="spelling-section">
         <button class="hear-word-btn" id="hear-word-btn">🔊 Hear the Word</button>
+        <div class="spell-definition hidden" id="spell-definition">
+          <div class="spell-def-meta" id="spell-pos"></div>
+          <div class="spell-def-text" id="spell-def-text"></div>
+          <button class="hear-def-btn" id="hear-definition-btn">🔊 Hear Definition</button>
+        </div>
         <input type="text" class="spell-input" id="spell-input" placeholder="Type the word you heard…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         <button class="btn-primary" id="spelling-submit-btn">Check Spelling</button>
       </div>
@@ -766,7 +794,8 @@ let state = {
   currentIdx: 0,
   results: [],
   apiKey: '',
-  selectedChoice: null
+  selectedChoice: null,
+  triesLeft: 0
 };
 
 /* ══════════════════════════════════════════════════
@@ -1045,12 +1074,22 @@ function handleTimerExpired() {
     $('spell-input').disabled = true;
     $('spelling-submit-btn').disabled = true;
     $('hear-word-btn').disabled = true;
+    $('hear-definition-btn').disabled = true;
     const correctWord = (q.word || q.correct_answer || '').trim();
     const isCorrect = userAns.toLowerCase() === correctWord.toLowerCase() && userAns !== '(time expired)';
     showFeedback(isCorrect ? 'correct' : 'wrong', q.explanation, correctWord);
     state.results.push({ question: q.question, userAnswer: userAns,
       correctAnswer: correctWord, isCorrect,
       explanation: q.explanation, type: 'SPELLING', topic: q.topic || '' });
+    showNextOrFinish();
+  } else if (q.type === 'RIDDLE' || q.type === 'PUZZLE') {
+    const userAns = $('frq-textarea').value.trim() || '(time expired)';
+    $('frq-textarea').disabled = true;
+    $('frq-submit-btn').disabled = true;
+    showFeedback('wrong', q.explanation, q.answer);
+    state.results.push({ question: q.question, userAnswer: userAns,
+      correctAnswer: q.answer, isCorrect: false,
+      explanation: q.explanation, type: q.type, topic: q.topic || '' });
     showNextOrFinish();
   } else {
     const userAns = $('frq-textarea').value.trim() || '(time expired)';
@@ -1083,6 +1122,9 @@ function buildExportText() {
     if (r.type === 'MCQ') {
       t += `Your answer: ${r.userAnswer}\n`;
       if (!r.isCorrect) t += `Correct:     ${r.correctAnswer}\n`;
+    } else if (r.type === 'RIDDLE' || r.type === 'PUZZLE') {
+      t += `Your answer: ${r.userAnswer}\n`;
+      t += `Answer: ${r.correctAnswer}\n`;
     } else {
       t += `Your answer: ${r.userAnswer}\n`;
       t += `Model answer: ${r.correctAnswer}\n`;
@@ -1116,12 +1158,13 @@ function revealCard(id) {
 }
 
 function updateSummary() {
-  const isSpelling = !!(EXAM_TOPICS[state.exam] && EXAM_TOPICS[state.exam].noTopics);
+  const isSpelling = !!(EXAM_TOPICS[state.exam] && EXAM_TOPICS[state.exam].noTopics && !EXAM_TOPICS[state.exam].noDifficulty);
+  const isNoDifficulty = !!(EXAM_TOPICS[state.exam] && EXAM_TOPICS[state.exam].noDifficulty);
   const missing = [];
   if (!state.exam) missing.push('exam');
-  if (!isSpelling && !state.topics.length) missing.push('at least one topic');
-  if (!isSpelling && !state.qType) missing.push('question type');
-  if (!state.difficulty) missing.push('difficulty');
+  if (!isSpelling && !isNoDifficulty && !state.topics.length) missing.push('at least one topic');
+  if (!isSpelling && !isNoDifficulty && !state.qType) missing.push('question type');
+  if (!isNoDifficulty && !state.difficulty) missing.push('difficulty');
   if (!state.numQ) missing.push('number of questions');
 
   if (missing.length > 0) {
@@ -1129,9 +1172,15 @@ function updateSummary() {
     $('summary-text').textContent = 'Still needed: ' + missing.join(', ');
   } else {
     $('generate-btn').disabled = false;
-    $('summary-text').textContent = isSpelling
-      ? state.numQ + ' spelling words · ' + state.difficulty + ' · Scripps word list'
-      : state.numQ + ' ' + state.difficulty + ' ' + state.qType + ' questions on ' + state.topics.length + ' topic(s)';
+    const examDef = EXAM_TOPICS[state.exam] || {};
+    if (isNoDifficulty) {
+      const typeLabel = state.qType === 'RIDDLE' ? 'riddles' : 'puzzles';
+      $('summary-text').textContent = state.numQ + ' ' + typeLabel + ' · ' + state.exam;
+    } else if (isSpelling) {
+      $('summary-text').textContent = state.numQ + ' spelling words · ' + state.difficulty + ' · Scripps word list';
+    } else {
+      $('summary-text').textContent = state.numQ + ' ' + state.difficulty + ' ' + state.qType + ' questions on ' + state.topics.length + ' topic(s)';
+    }
   }
 }
 
@@ -1160,14 +1209,31 @@ function buildExamButtons() {
       $('generate-card').classList.add('hidden');
 
       const examDef = EXAM_TOPICS[key] || {};
-      if (examDef.noTopics) {
+      if (examDef.noDifficulty) {
+        // Riddles / Math Puzzles: skip topics, type, AND difficulty
+        $('topics-card').classList.add('hidden');
+        $('question-type-section').classList.add('hidden');
+        $('difficulty-section').classList.add('hidden');
+        $('diff-sep').classList.add('hidden');
+        // Auto-set type and difficulty
+        state.qType = key.startsWith('Riddles') ? 'RIDDLE' : 'PUZZLE';
+        state.difficulty = 'Standard';
+        revealCard('options-card');
+        // Also auto-reveal number card since no choices needed in options-card
+        revealCard('num-card');
+        revealCard('generate-card');
+      } else if (examDef.noTopics) {
         // Skip topics step — jump directly to Step 3 (options), hiding Question Type
         $('topics-card').classList.add('hidden');
         $('question-type-section').classList.add('hidden');
+        $('difficulty-section').classList.remove('hidden');
+        $('diff-sep').classList.remove('hidden');
         state.qType = 'SPELLING';
         revealCard('options-card');
       } else {
         $('question-type-section').classList.remove('hidden');
+        $('difficulty-section').classList.remove('hidden');
+        $('diff-sep').classList.remove('hidden');
         renderTopics();
         revealCard('topics-card');
       }
@@ -1306,12 +1372,13 @@ $('generate-btn').addEventListener('click', async () => {
   localStorage.setItem('anthropic_key', apiKey);
 
   // Validate all fields with a clear message
-  const isSpellingExam = !!(EXAM_TOPICS[state.exam] && EXAM_TOPICS[state.exam].noTopics);
+  const isSpellingExam = !!(EXAM_TOPICS[state.exam] && EXAM_TOPICS[state.exam].noTopics && !EXAM_TOPICS[state.exam].noDifficulty);
+  const isNoDifficultyExam = !!(EXAM_TOPICS[state.exam] && EXAM_TOPICS[state.exam].noDifficulty);
   const missing = [];
   if (!state.exam) missing.push('exam');
-  if (!isSpellingExam && !state.topics.length) missing.push('at least one topic');
-  if (!isSpellingExam && !state.qType) missing.push('question type (MCQ or FRQ)');
-  if (!state.difficulty) missing.push('difficulty level');
+  if (!isSpellingExam && !isNoDifficultyExam && !state.topics.length) missing.push('at least one topic');
+  if (!isSpellingExam && !isNoDifficultyExam && !state.qType) missing.push('question type (MCQ or FRQ)');
+  if (!isNoDifficultyExam && !state.difficulty) missing.push('difficulty level');
   if (!state.numQ) missing.push('number of questions');
   if (missing.length > 0) {
     showError('Still missing: ' + missing.join(', '));
@@ -1337,7 +1404,11 @@ $('generate-btn').addEventListener('click', async () => {
     let prompt;
     let spellingWords = [];
 
-    if (isSpellingExam) {
+    if (isNoDifficultyExam) {
+      // Riddles / Math Puzzles: use dedicated prompt builder
+      const recentSeeds = getRecentQuestionSeeds(state.exam);
+      prompt = buildRiddlePuzzlePrompt(recentSeeds);
+    } else if (isSpellingExam) {
       // Spelling: pick fresh words from config (no fetch), ask API for sentences only
       const allWords = loadScrippsWords();
       spellingWords = pickFreshSpellingWords(allWords, state.numQ);
@@ -1404,7 +1475,11 @@ $('generate-btn').addEventListener('click', async () => {
       throw new Error('API returned no questions. Try again.');
     }
 
-    if (isSpellingExam) {
+    if (isNoDifficultyExam) {
+      // Tag every question with the correct type
+      state.questions = parsed.questions.map(q => ({ ...q, type: state.qType }));
+      saveRecentQuestionSeeds(state.exam, parsed.questions);
+    } else if (isSpellingExam) {
       // Save the words we used so they won't repeat soon
       saveUsedSpellingWords(spellingWords);
       // Ensure every question has type=SPELLING
@@ -1540,12 +1615,37 @@ Return ONLY valid JSON — no markdown, no extra text.
 }
 
 /* ══════════════════════════════════════════════════
+   RIDDLE / PUZZLE PROMPT BUILDER
+══════════════════════════════════════════════════ */
+function buildRiddlePuzzlePrompt(recentSeeds = []) {
+  const examDef = EXAM_TOPICS[state.exam] || {};
+  const instructions = examDef.frqInstructions || '';
+
+  const cfg = APP_CONFIG.questionVariety || {};
+  const seedsInPrompt = cfg.seedsIncludedInPrompt || 10;
+  const recentToShow = (recentSeeds || []).slice(-seedsInPrompt);
+  const varietyHint = recentToShow.length >= 3
+    ? `\n========================\n🔄 VARIETY REQUIREMENT\n========================\nGenerate COMPLETELY DIFFERENT questions from these recently shown ones:\n${recentToShow.map((s, i) => `[${i + 1}] ${s}`).join('\n')}`
+    : '';
+
+  return `${instructions}
+
+========================
+📦 QUANTITY
+========================
+Generate exactly ${state.numQ} questions.${varietyHint}
+
+🚫 No trailing commas. No text outside the JSON. No numbering inside question text. No empty fields.`;
+}
+
+
+/* ══════════════════════════════════════════════════
    SPELLING PROMPT — sentences only, words from local list
 ══════════════════════════════════════════════════ */
 function buildSpellingPrompt(words = []) {
   const examDef = EXAM_TOPICS[state.exam] || {};
   const instructions = examDef.spellingPromptInstructions ||
-    `You are an expert 3rd grade spelling teacher.\n\nFor each word in the list, write a fill-in-the-blank sentence for a 3rd grader. Replace the word with ___. Include a brief spelling hint.\n\nReturn ONLY valid JSON:\n{\n  "questions": [\n    { "word": "...", "question": "...", "explanation": "..." }\n  ]\n}`;
+    `You are an expert 3rd grade spelling teacher.\n\nFor each word in the list, write a fill-in-the-blank sentence for a 3rd grader. Replace the word with ___. Include the part of speech, a simple definition, and a brief spelling hint.\n\nReturn ONLY valid JSON:\n{\n  "questions": [\n    { "word": "...", "question": "...", "partOfSpeech": "...", "definition": "...", "explanation": "..." }\n  ]\n}`;
 
   return `${instructions}
 
@@ -1591,6 +1691,7 @@ function renderQuestion() {
   $('finish-btn').classList.add('hidden');
 
   const isSpelling = q.type === 'SPELLING';
+  const isRiddleOrPuzzle = q.type === 'RIDDLE' || q.type === 'PUZZLE';
 
   // Hide all input sections first
   $('frq-textarea').classList.add('hidden');
@@ -1601,26 +1702,50 @@ function renderQuestion() {
   $('spell-input').disabled = false;
   $('spelling-submit-btn').disabled = false;
   $('hear-word-btn').disabled = false;
+  $('hear-definition-btn').disabled = false;
   state.selectedChoice = null;
   $('mcq-submit-btn').disabled = true;
 
   if (isSpelling) {
     $('choices-container').innerHTML = '';
     $('spelling-section').classList.remove('hidden');
+
+    // Show definition + part of speech if available
+    const defBox = $('spell-definition');
+    if (q.definition) {
+      $('spell-pos').textContent = q.partOfSpeech ? q.partOfSpeech : '';
+      $('spell-def-text').textContent = q.definition;
+      defBox.classList.remove('hidden');
+    } else {
+      defBox.classList.add('hidden');
+    }
+
     // Auto-speak the word after a short delay so the student is ready
     setTimeout(() => {
       speakWord(q.word || q.correct_answer || '');
     }, 600);
+  } else if (isRiddleOrPuzzle) {
+    $('choices-container').innerHTML = '';
+    $('frq-textarea').classList.remove('hidden');
+    $('frq-textarea').placeholder = q.type === 'RIDDLE' ? 'Type your answer to the riddle…' : 'Type your answer to the puzzle…';
+    $('frq-submit-row').classList.remove('hidden');
+    $('frq-textarea').value = '';
+    $('frq-textarea').disabled = false;
+    $('frq-submit-btn').disabled = false;
+    $('frq-submit-btn').textContent = 'Submit Answer';
+    state.triesLeft = 2; // 3 total attempts: 1 initial + 2 retries
   } else if (isMCQ) {
     renderChoices(q);
     $('mcq-submit-row').classList.remove('hidden');
   } else {
     $('choices-container').innerHTML = '';
     $('frq-textarea').classList.remove('hidden');
+    $('frq-textarea').placeholder = 'Write your answer here…';
     $('frq-submit-row').classList.remove('hidden');
     $('frq-textarea').value = '';
     $('frq-textarea').disabled = false;
     $('frq-submit-btn').disabled = false;
+    $('frq-submit-btn').textContent = 'Check My Answer';
   }
 
   startTimer(state.timerSecs);
@@ -1696,6 +1821,95 @@ $('frq-submit-btn').addEventListener('click', () => {
   const q = state.questions[state.currentIdx];
   const userAns = $('frq-textarea').value.trim();
   if (!userAns) return;
+
+  const isRiddleOrPuzzle = q.type === 'RIDDLE' || q.type === 'PUZZLE';
+
+  if (isRiddleOrPuzzle) {
+    // Normalize both answers for comparison:
+    // • lowercase + trim
+    // • strip leading articles (a, an, the)
+    // • strip punctuation (keep spaces between words)
+    // • collapse whitespace
+    const normalizeRiddle = s => {
+      let t = s.toLowerCase().trim();
+      t = t.replace(/^(a|an|the)\s+/i, '');
+      t = t.replace(/[^a-z0-9\s]/g, '').trim();
+      t = t.replace(/\s+/g, ' ');
+      return t;
+    };
+    // Also strip a trailing 's' for simple plural flexibility (e.g. "kites" matches "kite")
+    const stem = s => (s.endsWith('s') && s.length > 2) ? s.slice(0, -1) : s;
+    const normUser = normalizeRiddle(userAns);
+    const normAnswer = normalizeRiddle(q.answer);
+    const isCorrect = normUser === normAnswer || stem(normUser) === stem(normAnswer);
+
+    if (isCorrect) {
+      // ✅ Correct on this attempt
+      clearTimer();
+      $('frq-textarea').disabled = true;
+      $('frq-submit-btn').disabled = true;
+      showFeedback('correct', q.explanation, null);
+      // Show model answer in the correct feedback so user sees the canonical phrasing
+      $('feedback-model-answer').classList.remove('hidden');
+      $('feedback-model-answer').textContent = 'Answer: ' + q.answer;
+      state.results.push({
+        question: q.question,
+        userAnswer: userAns,
+        correctAnswer: q.answer,
+        isCorrect: true,
+        explanation: q.explanation,
+        type: q.type,
+        topic: q.topic || ''
+      });
+      showNextOrFinish();
+    } else if (state.triesLeft > 0) {
+      // ❌ Wrong but still has tries left — show retry feedback
+      state.triesLeft--;
+      const triesMsg = state.triesLeft === 1
+        ? '1 try remaining. Give it another shot! 💡'
+        : state.triesLeft === 0
+          ? 'Last try — think carefully! 🤔'
+          : state.triesLeft + ' tries remaining.';
+
+      const box = $('feedback-box');
+      const titleEl = $('feedback-title');
+      const expEl = $('feedback-explanation');
+      const modelEl = $('feedback-model-answer');
+      const gradeRow = $('frq-grade-row');
+
+      box.classList.remove('hidden', 'correct', 'wrong', 'frq');
+      box.classList.add('wrong');
+      titleEl.textContent = '❌ Not quite! ' + triesMsg;
+      modelEl.classList.add('hidden');
+      expEl.textContent = 'Try again! Clear your answer and take another look at the question.';
+      gradeRow.classList.add('hidden');
+
+      // Clear textarea and re-enable for next attempt
+      $('frq-textarea').value = '';
+      $('frq-textarea').disabled = false;
+      $('frq-submit-btn').disabled = false;
+      $('frq-submit-btn').textContent = state.triesLeft === 0 ? 'Final Answer' : 'Submit Answer';
+    } else {
+      // ❌ Out of tries — reveal the answer
+      clearTimer();
+      $('frq-textarea').disabled = true;
+      $('frq-submit-btn').disabled = true;
+      showFeedback('wrong', q.explanation, q.answer);
+      state.results.push({
+        question: q.question,
+        userAnswer: userAns,
+        correctAnswer: q.answer,
+        isCorrect: false,
+        explanation: q.explanation,
+        type: q.type,
+        topic: q.topic || ''
+      });
+      showNextOrFinish();
+    }
+    return;
+  }
+
+  // Standard FRQ behaviour (unchanged)
   clearTimer();
   $('frq-textarea').disabled = true;
   $('frq-submit-btn').disabled = true;
@@ -1737,6 +1951,20 @@ $('hear-word-btn').addEventListener('click', () => {
   speakWord(q.word || q.correct_answer || '');
 });
 
+$('hear-definition-btn').addEventListener('click', () => {
+  const q = state.questions[state.currentIdx];
+  if (!q.definition) return;
+  const text = q.partOfSpeech
+    ? `${q.partOfSpeech}. ${q.definition}`
+    : q.definition;
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.rate = 0.85;
+  utt.pitch = 1;
+  window.speechSynthesis.speak(utt);
+});
+
 // Allow pressing Enter in the spell input to submit
 $('spell-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') $('spelling-submit-btn').click();
@@ -1750,6 +1978,7 @@ $('spelling-submit-btn').addEventListener('click', () => {
   $('spell-input').disabled = true;
   $('spelling-submit-btn').disabled = true;
   $('hear-word-btn').disabled = true;
+  $('hear-definition-btn').disabled = true;
 
   const correctWord = (q.word || q.correct_answer || '').trim();
   const isCorrect = userAns.toLowerCase() === correctWord.toLowerCase();
@@ -1896,6 +2125,8 @@ function showResults() {
   const mcqTotal = results.filter(r => r.type === 'MCQ').length;
   const frqTotal = results.filter(r => r.type === 'FRQ').length;
   const spellingTotal = results.filter(r => r.type === 'SPELLING').length;
+  const riddleTotal = results.filter(r => r.type === 'RIDDLE').length;
+  const puzzleTotal = results.filter(r => r.type === 'PUZZLE').length;
 
   const ring = $('score-ring');
   const title = $('results-title');
@@ -1911,6 +2142,8 @@ function showResults() {
     if (mcqTotal > 0) parts.push(`${results.filter(r => r.type === 'MCQ' && r.isCorrect).length} of ${mcqTotal} MCQ correct`);
     if (spellingTotal > 0) parts.push(`${results.filter(r => r.type === 'SPELLING' && r.isCorrect).length} of ${spellingTotal} spelling correct`);
     if (frqTotal > 0) parts.push(`${results.filter(r => r.type === 'FRQ' && r.isCorrect === true).length} of ${frqTotal} FRQ self-marked correct`);
+    if (riddleTotal > 0) parts.push(`${results.filter(r => r.type === 'RIDDLE' && r.isCorrect === true).length} of ${riddleTotal} riddles solved`);
+    if (puzzleTotal > 0) parts.push(`${results.filter(r => r.type === 'PUZZLE' && r.isCorrect === true).length} of ${puzzleTotal} puzzles solved`);
     sub.textContent = parts.join(' · ');
   } else {
     ring.textContent = '—';
@@ -1970,6 +2203,15 @@ function showResults() {
         correctPill.textContent = 'Correct: ' + r.correctAnswer;
         answerRow.appendChild(correctPill);
       }
+    } else if (r.type === 'RIDDLE' || r.type === 'PUZZLE') {
+      const yourPill = document.createElement('span');
+      yourPill.className = `review-answer-pill ${r.isCorrect ? 'correct' : 'wrong'}`;
+      yourPill.textContent = 'Your answer: ' + r.userAnswer;
+      answerRow.appendChild(yourPill);
+      const correctPill = document.createElement('span');
+      correctPill.className = 'review-answer-pill correct';
+      correctPill.textContent = 'Answer: ' + r.correctAnswer;
+      answerRow.appendChild(correctPill);
     } else {
       const truncated = r.userAnswer.length > 120 ? r.userAnswer.substring(0, 120) + '…' : r.userAnswer;
       const yourPill = document.createElement('span');
@@ -1982,7 +2224,7 @@ function showResults() {
     // Assemble the review item via safe DOM ops
     const qNum = document.createElement('div');
     qNum.className = 'review-q-num';
-    const statusLabel = r.type === 'MCQ' || r.type === 'SPELLING'
+    const statusLabel = r.type === 'MCQ' || r.type === 'SPELLING' || r.type === 'RIDDLE' || r.type === 'PUZZLE'
       ? (r.isCorrect ? ' · ✅ Correct' : ' · ❌ Incorrect')
       : (r.isCorrect === true ? ' · ✅ Self-marked correct' : ' · ❌ Self-marked incorrect');
     qNum.textContent = `Q${i + 1} · ${r.type}${statusLabel}`;
@@ -2021,12 +2263,15 @@ function showResults() {
 $('restart-btn').addEventListener('click', () => {
   $('results-screen').style.display = 'none';
   $('setup-screen').style.display = 'block';
-  state = { exam: null, topics: [], qType: null, difficulty: null, numQ: null, timerSecs: state.timerSecs, questions: [], currentIdx: 0, results: [], apiKey: $('api-key-input').value, selectedChoice: null };
+  state = { exam: null, topics: [], qType: null, difficulty: null, numQ: null, timerSecs: state.timerSecs, questions: [], currentIdx: 0, results: [], apiKey: $('api-key-input').value, selectedChoice: null, triesLeft: 0 };
   document.querySelectorAll('.exam-btn').forEach(b => b.classList.remove('selected'));
   $('topics-card').classList.add('hidden');
   $('options-card').classList.add('hidden');
   $('num-card').classList.add('hidden');
   $('generate-card').classList.add('hidden');
+  // Restore difficulty section visibility for next selection
+  $('difficulty-section').classList.remove('hidden');
+  $('diff-sep').classList.remove('hidden');
   hideError();
   renderHistory();
   renderStreak();
